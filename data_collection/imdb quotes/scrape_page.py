@@ -95,6 +95,7 @@ def scrape_page(episode_id):
 		new_quote = Quote(full_quote_string, quote_characters, episode_id)
 		all_quotes.append(new_quote)
 
+		# Add quote object to each character involved in the quote
 		for char_name in quote_characters:
 			c = get_character_by_name(char_name)
 			if c:
