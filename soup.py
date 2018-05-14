@@ -17,7 +17,7 @@ else:
 	html_file.close()
 
 
-#Character class
+#Character object
 class Character:
 	def __init__(self, name, role, season_of_death, episode_of_death, means_of_death):
 		self.name = name
