@@ -65,17 +65,44 @@ class KAGGLE:
     
     def predictions(self):
         """
+        Parameters:
 
-        ['S.No' 'actual' 'pred' 'alive' 'plod' 'name' 'title' 'male' 'culture'
- 'dateOfBirth' 'DateoFdeath' 'mother' 'father' 'heir' 'house' 'spouse'
- 'book1' 'book2' 'book3' 'book4' 'book5' 'isAliveMother' 'isAliveFather'
- 'isAliveHeir' 'isAliveSpouse' 'isMarried' 'isNoble' 'age'
- 'numDeadRelations' 'boolDeadRelations' 'isPopular' 'popularity' 'isAlive']
-
+        Returns:
+        :S.No:
+        :actual:
+        :pred:
+        :alive:
+        :plod:
+        :name:
+        :title:
+        :male:
+        :culture:
+        :dateOfBirth:
+        :dateOfDeath:
+        :mother:
+        :father:
+        :heir:
+        :house:
+        :spouse:
+        :book1:
+        :book2:
+        :book3:
+        :book4:
+        :book5:
+        :isAliveMother:
+        :isAliveFather:
+        :isAliveHeir:
+        :isAliveSpouse:
+        :isMarried:
+        :isNoble:
+        :age:
+        :numDeadRelations:
+        :boolDeadRelations:
+        :isPopular:
+        :popularity:
+        :isAlive:
         """
         return pd.read_csv(self.dir + 'character-predictions.csv', sep=',', header=0)
-
-
 
 class IMDB:
 
@@ -84,7 +111,7 @@ class IMDB:
         self.id = id
         self.title = title
 
-    def name_basics(self, nconst):
+    def actor_basics(self, nconst):
         """
         Parameters:
         :nconst:            unique identifier
@@ -98,7 +125,7 @@ class IMDB:
         :knownForTitles:    titles the person is known for
         """
         df =  pd.read_table(self.dir + 'name.basics.tsv.gz', sep='\t', header=0)
-        return df.loc[df['nconst'] == nconst]
+        return df.loc[df['nconst'] == nconst].as_matrix()[0]
 
     def title_akas(self):
         """
@@ -115,7 +142,7 @@ class IMDB:
         :isOriginalTitle:   boolean {0 not original, 1 original}
         """
         df = pd.read_table(self.dir + 'title.akas.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == self.id]
+        return df.loc[df['tconst'] == self.id].as_matrix()[0]
 
     def title_basics(self):
         """
@@ -133,9 +160,9 @@ class IMDB:
         :genres:            top-3 genres associated with the tile
         """
         df = pd.read_table(self.dir + 'title.basics.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == self.id]
+        return df.loc[df['tconst'] == self.id].as_matrix()[0]
 
-    def title_crew(self, episode):
+    def crew(self, episode):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -146,9 +173,9 @@ class IMDB:
         :writers:           writers of the given titles
         """
         df = pd.read_table(self.dir + 'title.crew.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode]
+        return df.loc[df['tconst'] == episode].as_matrix()[0]
 
-    def title_episode(self, episode):
+    def episode(self, episode):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -160,21 +187,33 @@ class IMDB:
         :episodeNumber      episode number of the tconst in the TV series
         """
         df = pd.read_table(self.dir + 'title.episode.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode]
+        return df.loc[df['tconst'] == episode].as_matrix()[0]
 
-    def title_principals(self, episode):
+    def principals(self, episode):
         """
         Parameters:
         :episode:           unique identifier
 
         Returns:
         :tconst:            unique identifier
-        :princiaplCast:     array of nconst
+        :principalCast:     array of nconst
         """
         df = pd.read_table(self.dir + 'title.principals.tsv.gz', sep='\t', header=0)
         return df.loc[df['tconst'] == episode]
 
-    def title_ratings(self, episode):
+    def cast(self, episode):
+        """
+        Parameters:
+        :episode:           unique identifier
+
+        Returns:
+        :tconst:            unique identifier
+        :principalCast:     array of nconst
+        """
+        df = pd.read_table(self.dir + 'title.principals.tsv.gz', sep='\t', header=0)
+        return df.loc[(df['tconst'] == episode) & df['category'].isin(('actor', 'actress'))]
+
+    def ratings(self, episode):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -185,7 +224,7 @@ class IMDB:
         :numVotes:          number of votes the title has received
         """
         df = pd.read_table(self.dir + 'title.ratings.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode]
+        return df.loc[df['tconst'] == episode].as_matrix()[0]
 
     def all_episodes(self):
         """
