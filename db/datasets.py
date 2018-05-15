@@ -1,12 +1,20 @@
 import numpy as np 
 import pandas as pd 
 from os import path
+import urllib.request
+
+
+def get_file(URI, DATA_DIR, file):
+    file_path = DATA_DIR + file
+    if not path.exists(file_path):
+        urllib.request.urlretrieve(URI + file, file_path)
 
 
 class KAGGLE:
 
-    def __init__(self, dir='data/kaggle/'):
-        self.dir = dir
+    def __init__(self):
+        self.data_dir = '../data/'
+        self.uri = 'https://www.kaggle.com/mylesoneill/game-of-thrones/downloads/'
 
     def battles(self):
         """
@@ -40,7 +48,9 @@ class KAGGLE:
         :region:
         :note:
         """
-        return pd.read_csv(self.dir + 'battles.csv', sep=',', header=0)
+        file = 'battles.csv'
+        get_file(self.uri, self.data_dir, file)
+        return pd.read_csv(self.data_dir + file, sep=',', header=0)
 
     def deaths(self):
         """
@@ -106,10 +116,10 @@ class KAGGLE:
 
 class IMDB:
 
-    def __init__(self, dir='data/imdb/', id='tt0944947', title='Game of Thrones'):
-        self.dir = dir
-        self.id = id
-        self.title = title
+    def __init__(self):
+        self.parentID = 'tt0944947'
+        self.data_dir = '../data/'
+        self.uri = 'https://datasets.imdbws.com/'
 
     def actor_basics(self, nconst):
         """
@@ -124,8 +134,10 @@ class IMDB:
         :primaryProfession: top-3 professions of the person
         :knownForTitles:    titles the person is known for
         """
-        df =  pd.read_table(self.dir + 'name.basics.tsv.gz', sep='\t', header=0)
-        return df.loc[df['nconst'] == nconst].as_matrix()[0]
+        file = 'name.basics.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df =  pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['nconst'] == nconst].to_dict('records')[0]
 
     def title_akas(self):
         """
@@ -141,10 +153,12 @@ class IMDB:
         :attributes:        additional terms
         :isOriginalTitle:   boolean {0 not original, 1 original}
         """
-        df = pd.read_table(self.dir + 'title.akas.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == self.id].as_matrix()[0]
+        file = 'title.akas.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == self.id].to_dict('records')
 
-    def title_basics(self):
+    def title_basics(self, EID):
         """
         Parameters:
 
@@ -159,10 +173,12 @@ class IMDB:
         :runtimeMinutes:    primary runtime of the title in minutes
         :genres:            top-3 genres associated with the tile
         """
-        df = pd.read_table(self.dir + 'title.basics.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == self.id].as_matrix()[0]
+        file = 'title.basics.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == EID].to_dict('records')[0]
 
-    def crew(self, episode):
+    def crew(self, EID):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -172,10 +188,12 @@ class IMDB:
         :directors:         array of nconsts
         :writers:           writers of the given titles
         """
-        df = pd.read_table(self.dir + 'title.crew.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode].as_matrix()[0]
+        file = 'title.crew.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == EID].to_dict('records')
 
-    def episode(self, episode):
+    def episode(self, EID):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -184,24 +202,14 @@ class IMDB:
         :tconst:            unique identifer
         :parentTconst:      unique identifier
         :seasonNumber:      season number the episode belongs to
-        :episodeNumber      episode number of the tconst in the TV series
+        :episodeNumber:     episode number of the tconst in the TV series
         """
-        df = pd.read_table(self.dir + 'title.episode.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode].as_matrix()[0]
+        file = 'title.episode.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == EID].to_dict('records')[0]
 
-    def principals(self, episode):
-        """
-        Parameters:
-        :episode:           unique identifier
-
-        Returns:
-        :tconst:            unique identifier
-        :principalCast:     array of nconst
-        """
-        df = pd.read_table(self.dir + 'title.principals.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode]
-
-    def cast(self, episode):
+    def principals(self, EID):
         """
         Parameters:
         :episode:           unique identifier
@@ -210,10 +218,26 @@ class IMDB:
         :tconst:            unique identifier
         :principalCast:     array of nconst
         """
-        df = pd.read_table(self.dir + 'title.principals.tsv.gz', sep='\t', header=0)
-        return df.loc[(df['tconst'] == episode) & df['category'].isin(('actor', 'actress'))]
+        file = 'title.principals.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == EID].to_dict('records')
 
-    def ratings(self, episode):
+    def cast(self, EID):
+        """
+        Parameters:
+        :episode:           unique identifier
+
+        Returns:
+        :tconst:            unique identifier
+        :principalCast:     array of nconst
+        """
+        file = 'title.principals.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[(df['tconst'] == EID) & df['category'].isin(('actor', 'actress'))].to_dict('records')
+
+    def rating(self, EID):
         """
         Parameters:
         :episode:           tconst unique identifier
@@ -223,16 +247,21 @@ class IMDB:
         :averageRating:     weighter average of all the individual user ratings
         :numVotes:          number of votes the title has received
         """
-        df = pd.read_table(self.dir + 'title.ratings.tsv.gz', sep='\t', header=0)
-        return df.loc[df['tconst'] == episode].as_matrix()[0]
+        file = 'title.ratings.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        return df.loc[df['tconst'] == EID].to_dict('records')[0]
 
     def all_episodes(self):
         """
         Parameters:
 
         Returns:
-        :tconstt:           array of all GOT epidosdes
+        :tconst:           array of all GOT epidosdes
         """
-        df = pd.read_table(self.dir + 'title.episode.tsv.gz', sep='\t', header=0)
-        df = df.loc[df['parentTconst'] == self.id]
-        return df['tconst'].as_matrix()
+        file = 'title.episode.tsv.gz'
+        get_file(self.uri, self.data_dir, file)
+        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
+        df = df.loc[df['parentTconst'] == self.parentID]
+        return df['tconst'].tolist()
+

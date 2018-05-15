@@ -44,6 +44,9 @@ for ep in episodes:
     except:
         pass
 
+    try:
+        basics = imdb.title_basics(ep)
+
     data['title'] = ''
     data['duration'] = 60
 
