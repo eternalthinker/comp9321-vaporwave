@@ -27,12 +27,8 @@ class ice_and_fire:
 
 class characters:
     def __init__(self):
-        self.id = 0
         self.name = None
-        if self.name:
-            self.slug = self.name.lower().replace(' ','_')
-        else:
-            self.slug = None
+        self.slug = None
         self.gender = 'Male'
         self.culture = None
         self.titles = None
@@ -49,33 +45,37 @@ class characters:
         obj2 = characters()
         r = requests.get(url).json()
         obj2.name = r['name']
+        obj2.slug = r['name'].lower().replace(' ','_')
         obj2.gender = r['gender']
-        obj2.culture = r['culture'] if r['culture'] else 'Null'
-        obj2.titles = ' | '.join(r['titles']) if r['titles'] else 'Null'
-        obj2.aliases = ' | '.join( r['aliases']) if r['aliases'] else 'Null'
-        obj2.father = requests.get(r['father']).json()['name'] if r['father'] else 'Null'
-        obj2.mother = requests.get(r['mother']).json()['name'] if r['mother'] else 'Null'
-        obj2.spouse = requests.get(r['spouse']).json()['name'] if r['spouse'] else 'Null'
+        obj2.culture = r['culture'] if r['culture'] else 'NULL'
+        obj2.titles = ' , '.join(r['titles']) if r['titles'] else 'NULL'
+        obj2.aliases = ' , '.join( r['aliases']) if r['aliases'] else 'NULL'
+        obj2.father = requests.get(r['father']).json()['name'] if r['father'] else 'NULL'
+        obj2.mother = requests.get(r['mother']).json()['name'] if r['mother'] else 'NULL'
+        obj2.spouse = requests.get(r['spouse']).json()['name'] if r['spouse'] else 'NULL'
         if r['allegiances']:
             p = []
             for i in r['allegiances']:
                 m = requests.get(i).json()['name']
                 p.append(m)
-            obj2.allegiances = ' | '.join(p)
+            obj2.allegiances = ' , '.join(p)
         else:
             obj2.allegiances = 'NULL'
-        obj2.seasons = ' | '.join(r['tvSeries'])
-        obj2.actor =  ' | '.join(r['playedBy'])
+        obj2.seasons = ' , '.join(r['tvSeries']) if r['tvSeries'] else 'NULL'
+        obj2.actor = ' , '.join(r['playedBy']) if r['playedBy'] else 'NULL'
         return obj2
+
+# ice = ice_and_fire()
+# chars = ice.poV
+# c =  characters()
+# for url in chars:
+#     n = c.get_character(url)
+#     print(n.__dict__)
 
 class houses:
     def __init__(self):
-        self.url = None
         self.name = None
-        if self.name:
-            self.slug = self.name.lower().replace(' ','_')
-        else:
-            self.slug = None
+        self.slug = None
         self.name = None
         self.region = None
         self.coatOfArms = None,
@@ -92,26 +92,25 @@ class houses:
 
         for r in h:
             obj = houses()
-            obj.url = r['url']
             obj.name = r['name']
             if obj.name:
                 obj.slug = obj.name.lower().replace(' ', '_')
             else:
                 obj.slug = None
-            obj.region = r['region'] if r['region'] else 'Null'
-            obj.coatOfArms = r['coatOfArms'] if r['coatOfArms'] else 'Null'
-            obj.words = r['words'] if r['words'] else 'Null'
-            obj.titles = ' | '.join(r['titles']) if r['titles'] else 'Null'
-            obj.seats = ' | '.join(r['seats']) if r['seats'] else 'Null'
-            obj.currentLord = requests.get(r['currentLord']).json()['name'] if r['currentLord'] else 'Null'
-            obj.overlord = requests.get(r['overlord']).json()['name'] if r['overlord'] else 'Null'
+            obj.region = r['region'] if r['region'] else 'NULL'
+            obj.coatOfArms = r['coatOfArms'] if r['coatOfArms'] else 'NULL'
+            obj.words = r['words'] if r['words'] else 'NULL'
+            obj.titles = ' , '.join(r['titles']) if r['titles'] else 'NULL'
+            obj.seats = ' , '.join(r['seats']) if r['seats'] else 'NULL'
+            obj.currentLord = requests.get(r['currentLord']).json()['name'] if r['currentLord'] else 'NULL'
+            obj.overlord = requests.get(r['overlord']).json()['name'] if r['overlord'] else 'NULL'
 
             if r['swornMembers']:
                 p = []
                 for i in r['swornMembers']:
                     m = requests.get(i).json()['name']
                     p.append(m)
-                obj.swornMembers = ' | '.join(p)
+                obj.swornMembers = ' , '.join(p)
             else:
                 obj.swornMembers = 'NULL'
 
@@ -121,3 +120,7 @@ class houses:
         return self.c
 
 
+
+# k = houses().get_house()
+# for i in k:
+#     print(i.__dict__)
