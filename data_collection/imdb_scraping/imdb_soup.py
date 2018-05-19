@@ -30,7 +30,7 @@ episode_ids_test = ['tt1480055', 'tt1668746', 'tt1829962']
 if len(sys.argv) < 2:
 
 	# Scrape quotes
-	for e_id in episode_ids_test:
+	for e_id in episode_ids:
 		scrape_quotes(e_id)
 		time.sleep(randint(1, 3))
 		scrape_characters(e_id)
@@ -76,9 +76,13 @@ else:
 
 
 #Testing
+print("\n\n--------------CAST-----------------\n")
 for c in all_characters:
 	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
-		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " c.slug )
+		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " + c.slug )
+print("\n\n--------------EPISODES-----------------\n")
+for e in all_episodes:
+	print("Episode: " + e.episode_name + " (" + str(len(e.characters)) + " characters)")
 
 
 
