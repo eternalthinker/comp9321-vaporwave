@@ -3,7 +3,7 @@ from random import randint
 from scrape_quotes import *
 from scrape_characters import *
 
-# Usage: python3 imdb_soup.py [episode id]
+# Usage: python3 imdb_soup.py [episode id] [quotes||chars]
 # Episode id is optional, in case you just want to scrape one ID
 # Currently set to just scrape episode_ids_test
 
@@ -36,29 +36,20 @@ if len(sys.argv) < 2:
 		scrape_characters(e_id)
 		time.sleep(randint(1, 3))
 
-	# Scrape characters by episode
-
-
-	# # Testing
-	# for c in all_characters:
-	# 	print(c.name + ": " + str(len(c.quotes)) + " scraped quotes")
-
 # Scrape quotes and characters for one episode (argv[1] = episode_id)
 elif len(sys.argv) == 2:
 	e_id = sys.argv[1]
 	if e_id == "test":
 		scrape_quotes("test")
+		time.sleep(randint(1, 3))
+		scrape_characters("test")
 	elif not e_id in episode_ids:
 		print("Invalid episode id")
 		exit(1)
-
-	scrape_quotes(e_id)
-	scrape_characters(e_id)
-
-	# #Testing
-	# for c in all_characters:
-	# 	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
-	# 		+ "Features in " + str(len(c.episodes)) + " scraped episodes")
+	else:
+		scrape_quotes(e_id)
+		time.sleep(randint(1, 3))
+		scrape_characters(e_id)
 
 # Scrape either quotes or characters for one episode (argv[1] = episode_id, argv[2] = quotes||chars)
 elif len(sys.argv) == 3:
@@ -87,7 +78,7 @@ else:
 #Testing
 for c in all_characters:
 	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
-		+ "Features in " + str(len(c.episodes)) + " scraped episodes")
+		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " c.slug )
 
 
 

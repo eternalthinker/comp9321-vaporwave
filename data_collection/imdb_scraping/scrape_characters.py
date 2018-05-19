@@ -16,22 +16,14 @@ def scrape_characters(episode_id):
 		data = r.text
 		soup = BeautifulSoup(data, "lxml")
 
-	# print("\n\n\n\n")
-
-	# Characters are contained in table rows with class "even" or "odd".
-	# For the purposes of this, each "sodatext" is a quote, even if it contains a conversation with several characters.
-	# If it's a conversation, the "quote" is attributed to each of them.
-
 	# Get episode info
 	title_link = soup.find("a", class_="subnav_heading")
 	episode_title = title_link.contents[0].strip()
 	print("Episode title: " + episode_title)
 
-
+	# Characters are contained in table rows within cast_list
 	for table in soup.find_all("table", class_="cast_list"):
 		for char_row in table.find_all("tr"):
-
-			# print(char_row.contents)
 
 			# Get character name
 			char_name = ""
@@ -40,9 +32,10 @@ def scrape_characters(episode_id):
 				# Check if character name is enclosed in a link or not
 				char_link = name_row.find("a")
 				if char_link:
-					char_name = char_link.contents[0].replace('(uncredited)', '').strip()
+					char_name = char_link.contents[0]
 				else:
-					char_name = name_row.contents[0].replace('(uncredited)', '').strip()
+					char_name = name_row.contents[0]
+				char_name = re.sub(r'\(.*\)', '', char_name).strip() #remove bracketed info about character
 				print("Character: " + char_name)
 
 			if char_row.find("span", class_="itemprop"):

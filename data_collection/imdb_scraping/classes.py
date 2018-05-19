@@ -1,3 +1,6 @@
+
+import re
+
 # Simple data structures to store characters and quotes
 # Script can just put the info into these data structures, and we can iterate through them for db later
 # Perhaps it would be more useful to make an "Episode" class, this can be done....
@@ -22,6 +25,7 @@ class Character:
 		self.url = url			# The imdb URL could be scraped for each character, if this is useful
 		self.episodes = []
 		self.played_by = ""
+		self.slug = generate_slug(name)
 
 	def add_quote(self, quote):
 		self.quotes.append(quote)
@@ -34,11 +38,20 @@ class Character:
 		self.played_by = actor_name
 
 
+# Get character object with either name or slug
 def get_character_by_name(name):
+	slug = generate_slug(name)
 	for char in all_characters:
-		if char.name == name:
+		if char.slug == slug:
 			return char
 	return 0
+
+# Generate slug (character id)
+def generate_slug(name):
+	name = re.sub(r'\'.*\'', '', name).strip() 	# Remove nicknames, e.g. Petyr 'Littlefinger' Baelish 
+	name = re.sub(r' +', '_', name)				# Replace space with "_"
+	name = re.sub(r'[^a-zA-Z0-9_]+', '', name)		# Remove random characters, e.g. apostrophe, hash.
+	return name
 
 
 # Quote class
