@@ -36,7 +36,7 @@ episode_ids_large_test = ['tt3060910', 'tt3658012', 'tt3658014', 'tt3846626', 't
 if len(sys.argv) < 2:
 
 	# Scrape quotes
-	for e_id in episode_ids_test:
+	for e_id in episode_ids:
 		scrape_quotes(e_id)
 		time.sleep(randint(1, 3))
 		scrape_characters(e_id)
