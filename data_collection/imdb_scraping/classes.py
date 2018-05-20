@@ -26,12 +26,17 @@ class Episode:
 # Character class
 class Character:
 	def __init__(self, name, url=""):
-		self.name = name
+		self.name = self.clean_name(name)
 		self.quotes = []		# List of Quote objects for every quote the character says (or is part of, in conversation)
 		self.url = url			# The imdb URL could be scraped for each character, if this is useful
 		self.episodes = []		# Episodes that the character is in, list of imdb episode ids. 
 		self.played_by = ""
 		self.slug = generate_slug(name)
+
+	def clean_name(self, name):
+		name = re.sub(r'\n', '', name).strip()
+		name = name = re.sub(r' +', ' ', name)
+		return name	
 
 	def add_quote(self, quote):
 		self.quotes.append(quote)
@@ -55,6 +60,7 @@ class Quote:
 # General helper functions
 
 # Get character object with either name or slug
+# Matches by slug, which should help consolidate characters
 def get_character_by_name(name):
 	slug = generate_slug(name)
 	for char in all_characters:
@@ -64,9 +70,20 @@ def get_character_by_name(name):
 
 # Generate slug (character id)
 def generate_slug(name):
-	name = re.sub(r'\'.*\'', '', name).strip() 	# Remove nicknames, as in Petyr 'Littlefinger' Baelish 
-	name = re.sub(r' +', '_', name)				# Replace space with "_"
-	name = re.sub(r'[^a-zA-Z0-9_]+', '', name)	# Remove random characters, e.g. apostrophe, hash.
+	name = re.sub(r'\'.*\'', '', name).strip() 				# Remove nicknames, as in Petyr 'Littlefinger' Baelish 
+	name = re.sub(r'Ser ', '', name).strip()				# Remove titles from name
+	name = re.sub(r'Young ', '', name).strip()				# Remove titles from name
+	name = re.sub(r'Magister ', '', name).strip()			# Remove titles from name
+	name = re.sub(r'Lady ', '', name).strip()				# Remove titles from name
+	name = re.sub(r'Black ', '', name).strip()				# Remove titles from name
+	name = re.sub(r'Lord ', '', name).strip()				# Remove titles from name
+	name = re.sub(r'King ', '', name).strip()				# Remove titles from name
+	name = re.sub(r' Assassin', '', name).strip()			# Remove titles from name
+	name = re.sub(r'Florel', 'Forel', name).strip()			# typos
+	name = re.sub(r'^Karl$', 'Karl Tanner', name).strip()	# abbreviations
+	name = re.sub(r'$Ned ', 'Eddard', name).strip()			# Nicknames
+	name = re.sub(r'[^a-zA-Z0-9 ]+', '', name)				# Remove random characters, e.g. apostrophe, hash.
+	name = re.sub(r' +', '_', name)							# Replace space with "_"
 	return name
 
 # Get episode by id

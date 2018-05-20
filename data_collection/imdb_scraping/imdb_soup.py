@@ -25,12 +25,18 @@ episode_ids = ['tt1480055', 'tt1668746', 'tt1829962', 'tt1829963',
 
 episode_ids_test = ['tt1480055', 'tt1668746', 'tt1829962'] 
 
+episode_ids_large_test = ['tt3060910', 'tt3658012', 'tt3658014', 'tt3846626', 'tt3866826', 
+'tt3866836', 'tt3866838', 'tt3866840', 'tt3866842', 'tt3866846', 
+'tt3866850', 'tt3866862', 'tt4077554', 'tt4131606', 'tt4283016',
+'tt4283028', 'tt4283054', 'tt4283060', 'tt4283074', 'tt4283088', 
+'tt4283094']
+
 
 # Scrape quotes and characters for all episodes
 if len(sys.argv) < 2:
 
 	# Scrape quotes
-	for e_id in episode_ids:
+	for e_id in episode_ids_test:
 		scrape_quotes(e_id)
 		time.sleep(randint(1, 3))
 		scrape_characters(e_id)
@@ -80,6 +86,10 @@ print("\n\n--------------CAST-----------------\n")
 for c in all_characters:
 	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
 		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " + c.slug )
+	print("Features in episodes: ", end=" ")
+	for e in c.episodes:
+		print(e, end=" ")
+	print("")
 print("\n\n--------------EPISODES-----------------\n")
 for e in all_episodes:
 	print("Episode: " + e.episode_name + " (" + str(len(e.characters)) + " characters)")
