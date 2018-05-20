@@ -5,7 +5,6 @@ from scrape_characters import *
 
 # Usage: python3 imdb_soup.py [episode id] [quotes||chars]
 # Episode id is optional, in case you just want to scrape one ID
-# Currently set to just scrape episode_ids_test
 
 episode_ids = ['tt1480055', 'tt1668746', 'tt1829962', 'tt1829963', 
 'tt1829964', 'tt1837862', 'tt1837863', 'tt1837864', 'tt1851397', 
@@ -32,7 +31,7 @@ episode_ids_large_test = ['tt3060910', 'tt3658012', 'tt3658014', 'tt3846626', 't
 'tt4283094']
 
 
-# Scrape quotes and characters for all episodes
+# Scrape quotes and characters for all episodes (takes a few minutes)
 if len(sys.argv) < 2:
 
 	# Scrape quotes
