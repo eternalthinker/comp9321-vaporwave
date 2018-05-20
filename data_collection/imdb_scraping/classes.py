@@ -71,21 +71,22 @@ def get_character_by_name(name):
 # Generate slug (character id)
 def generate_slug(name):
 	name = re.sub(r'\'.*\'', '', name).strip() 				# Remove nicknames, as in Petyr 'Littlefinger' Baelish 
-	name = re.sub(r'^Ser ', '', name)						# Remove titles from name
-	name = re.sub(r'^Young ', '', name)						# Remove titles from name
-	name = re.sub(r'^Magister ', '', name)					# Remove titles from name
-	name = re.sub(r'^Lady ', '', name)						# Remove titles from name
-	name = re.sub(r'^Black ', '', name)						# Remove titles from name
-	name = re.sub(r'^Lord ', '', name)						# Remove titles from name
-	name = re.sub(r'^King ', '', name)						# Remove titles from name
-	name = re.sub(r' Assassin', '', name)					# Remove titles from name
+	name = re.sub(r'^Ser ', '', name)						# Remove titles from slug
+	name = re.sub(r'^Young ', '', name)						# Remove titles from slug
+	name = re.sub(r'^Magister ', '', name)					# Remove titles from slug
+	name = re.sub(r'^Lady ', '', name)						# Remove titles from slug
+	name = re.sub(r'^Black ', '', name)						# Remove titles from slug
+	name = re.sub(r'^Lord ', '', name)						# Remove titles from slug
+	name = re.sub(r'^King ', '', name)						# Remove titles from slug
+	name = re.sub(r'^Khal ', '', name)						# Remove titles from slug
+	name = re.sub(r' Assassin', '', name)					# Remove titles from slug
 	name = re.sub(r'Florel', 'Forel', name)					# typos
 	name = re.sub(r'^Karl$', 'Karl Tanner', name)			# abbreviations
 	name = re.sub(r'^Ned', 'Eddard', name).strip()			# Nicknames
 	name = re.sub(r'^Eddard$', 'Eddard Stark', name)		# Nicknames
 	name = re.sub(r'[^a-zA-Z0-9 ]+', '', name).strip()		# Remove random characters, e.g. apostrophe, hash.
-	name = re.sub(r' +', '_', name)							# Replace space with "_"
-	return name
+	slug = re.sub(r' +', '_', name)							# Replace space with "_"
+	return slug
 
 # Get episode by id
 def get_episode_by_id(id):
