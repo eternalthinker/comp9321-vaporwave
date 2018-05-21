@@ -2,6 +2,7 @@ import time, sys
 from random import randint
 from scrape_quotes import *
 from scrape_characters import *
+from scrape_deaths import *
 
 # Usage: python3 imdb_soup.py [episode id] [quotes||chars]
 # Episode id is optional, in case you just want to scrape one ID
@@ -37,9 +38,10 @@ if len(sys.argv) < 2:
 	# Scrape quotes
 	for e_id in episode_ids:
 		scrape_quotes(e_id)
-		time.sleep(randint(1, 3))
+		time.sleep(randint(1, 2))
 		scrape_characters(e_id)
-		time.sleep(randint(1, 3))
+		time.sleep(randint(1, 2))
+	scrape_deaths()
 
 # Scrape quotes and characters for one episode (argv[1] = episode_id)
 elif len(sys.argv) == 2:
@@ -48,6 +50,7 @@ elif len(sys.argv) == 2:
 		scrape_quotes("test")
 		time.sleep(randint(1, 3))
 		scrape_characters("test")
+		scrape_deaths()
 	elif not e_id in episode_ids:
 		print("Invalid episode id")
 		exit(1)
@@ -55,6 +58,7 @@ elif len(sys.argv) == 2:
 		scrape_quotes(e_id)
 		time.sleep(randint(1, 3))
 		scrape_characters(e_id)
+		scrape_deaths()
 
 # Scrape either quotes or characters for one episode (argv[1] = episode_id, argv[2] = quotes||chars)
 elif len(sys.argv) == 3:
@@ -79,24 +83,41 @@ else:
 	print("Usage: python3 imdb_soup.py [episode id] [quotes||chars]")
 	exit(1)
 
-
 # Testing
-# print("\n\n--------------CAST-----------------\n")
-# for c in all_characters:
-# 	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
-# 		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " + c.slug )
-# 	print("Features in episodes: ", end=" ")
-# 	for e in c.episodes:
-# 		print(e, end=" ")
-# 	print("")
+print("\n\n--------------CAST-----------------\n")
+for c in all_characters:
+	print(c.name + " (played by " + c.played_by + ") " + str(len(c.quotes)) + " scraped quotes. " 
+		+ "Features in " + str(len(c.episodes)) + " scraped episodes. " + "ID: " + c.slug )
+	print("Died in season: " + str(c.season_of_death))
+	print("Features in episodes: ", end=" ")
+	for e in c.episodes:
+		print(e, end=" ")
+	print("")
 
 print("\n\n--------------EPISODES-----------------\n")
 for e in all_episodes:
 	print("Episode: " + e.episode_name + " (" + str(len(e.characters)) + " characters)")
-	print("characters = [")
-	for c in e.characters:
-		print(c, end=", ")
-	print("]")
+	# print("characters = [")
+	# for c in e.characters:
+	# 	print(c, end=", ")
+	# print("]")
+
+
+
+
+# TODO: Itay to add db insertion logic here 
+# Look at classes.py to see the attributes of these objects
+for c in all_characters:
+	# Insert attributes into db
+	print("", end="")
+
+for q in all_quotes:
+	# Insert attributes into db
+	print("", end="")
+
+for e in all_episodes:
+	# Insert attributes into db
+	print("", end="")
 
 
 

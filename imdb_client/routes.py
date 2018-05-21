@@ -2,6 +2,11 @@ from flask import Flask, redirect, render_template, request, url_for, jsonify, R
 from flask_restful import reqparse
 from episode import *
 from quoteslist import *
+import sys
+
+sys.path.insert(0, '../db')
+
+from read_data import * #just checking I can get things from the db folder
 
 app = Flask(__name__)
 
