@@ -79,11 +79,8 @@ class Quote:
 # Get character object with either name or slug
 # Matches by slug, which should help consolidate characters
 def get_character_by_name(name):
-	print("looking for " + name)
 	slug = generate_slug(name)
-	print("looking for slug " + slug)
 	for char in all_characters:
-		print(char.slug)
 		if char.slug == slug:
 			return char
 	return 0
@@ -115,7 +112,7 @@ def generate_slug(name):
 	name = re.sub(r'^Lem$', 'Lem Lemoncloak', name)			# Nicknames
 	name = re.sub(r'^The Mountain$', 'Gregor Clegane', name)# Nicknames
 	name = re.sub(r'Weg Wun Dar', '', name)					# Nicknames
-	name = re.sub(r'Robin Arryn', 'Robert Arryn', name)		# Nicknames
+	name = re.sub(r'Robin Arryn', 'Robert Arryn', name)		# Series/book discrepancy
 	name = re.sub(r'Florel', 'Forel', name)					# typos
 	name = re.sub(r'[^a-zA-Z0-9 ]+', '', name).strip()		# Remove random characters, e.g. apostrophe, hash.
 	slug = re.sub(r' +', '_', name)							# Replace space with "_"

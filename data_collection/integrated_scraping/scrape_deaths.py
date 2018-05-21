@@ -47,7 +47,7 @@ def scrape_deaths():
 		c = get_character_by_name(name)
 
 		if not c:
-			print(name + " from Times deaths not found in characters-------------------------------------------")
+			print(name + " from Times deaths not found in characters for given episodes----------------")
 		else:
 			c.set_season_of_death(season_of_death)
 			c.set_episode_of_death(episode_of_death)
