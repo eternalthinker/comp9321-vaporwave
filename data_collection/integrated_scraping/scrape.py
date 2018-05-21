@@ -95,12 +95,14 @@ for c in all_characters:
 	print("")
 
 print("\n\n--------------EPISODES-----------------\n")
+# ep = Episode("a", 10)
 for e in all_episodes:
 	print("Episode: " + e.episode_name + " (" + str(len(e.characters)) + " characters)")
 	# print("characters = [")
 	# for c in e.characters:
 	# 	print(c, end=", ")
 	# print("]")
+	print("length: " + str(len(e.characters)))
 
 
 

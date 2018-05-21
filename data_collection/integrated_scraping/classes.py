@@ -3,15 +3,13 @@ import re
 
 # Simple data structures to store characters and quotes
 # Script can just put the info into these data structures, and we can iterate through them for db later
-# Perhaps it would be more useful to make an "Episode" class, this can be done....
+# Perhaps it would be more useful to build out "Episode" class...
 all_characters = []
 all_quotes = []
 all_episodes = []
 
-#create character id from slug
 
-
-# Character class
+# Episode class
 class Episode:
 	def __init__(self, name, id):
 		self.episode_name = name
@@ -101,7 +99,7 @@ def generate_slug(name):
 	name = re.sub(r'^King ', '', name)						# Remove titles from slug
 	name = re.sub(r'^Khal ', '', name)						# Remove titles from slug
 	name = re.sub(r'^Great', '', name).strip()				# Remove titles from slug
-	name = re.sub(r'II', '', name)							# Remove titles from slug, e.g. Aerys II Targaryen
+	name = re.sub(r'II', '', name)							# Remove titles from slug, Aerys II Targaryen
 	name = re.sub(r' Assassin', '', name)					# Nicknames
 	name = re.sub(r' Halfhand', '', name)					# Nicknames
 	name = re.sub(r'^Karl$', 'Karl Tanner', name)			# Nicknames
