@@ -1,130 +1,26 @@
 import numpy as np 
 import pandas as pd 
 from os import path
-import urllib.request
+import requests
+import json
 
-
-def get_file(URI, DATA_DIR, file):
-    file_path = DATA_DIR + file
-    if not path.exists(file_path):
-        urllib.request.urlretrieve(URI + file, file_path)
-
-
-class KAGGLE:
-
-    def __init__(self):
-        self.data_dir = '../data/'
-        self.uri = 'https://www.kaggle.com/mylesoneill/game-of-thrones/downloads/'
-
-    def battles(self):
-        """
-        Parameters:
-
-        Returns:
-        :name:
-        :year:
-        :battle_number:
-        :attacker_king:
-        :defender_king:
-        :attacker_1:
-        :attacker_2:
-        :attacker_3:
-        :attacker_4:
-        :defender_1:
-        :defender_2:
-        :defender_3:
-        :defender_4:
-        :attacker_outcome:
-        :battle_type:
-        :major_death:
-        :major_capture:
-        :major_capture:
-        :attacker_size:
-        :defender_size:
-        :attacker_commander:
-        :defender_commander:
-        :summer:
-        :location:
-        :region:
-        :note:
-        """
-        file = 'battles.csv'
-        get_file(self.uri, self.data_dir, file)
-        return pd.read_csv(self.data_dir + file, sep=',', header=0)
-
-    def deaths(self):
-        """
-        Parameters:
-
-        Returns:
-        :Name:
-        :Allegiances:
-        :Death Year:
-        :Book of Death:
-        :Death Chapter:
-        :Book Intro Chapter:
-        :Gender:
-        :Nobility:
-        :GoT:
-        :CoK:
-        :SoS:
-        :FfC:
-        :DwD:
-        """
-        return pd.read_csv(self.dir + 'character-deaths.csv', sep=',', header=0)
-    
-    def predictions(self):
-        """
-        Parameters:
-
-        Returns:
-        :S.No:
-        :actual:
-        :pred:
-        :alive:
-        :plod:
-        :name:
-        :title:
-        :male:
-        :culture:
-        :dateOfBirth:
-        :dateOfDeath:
-        :mother:
-        :father:
-        :heir:
-        :house:
-        :spouse:
-        :book1:
-        :book2:
-        :book3:
-        :book4:
-        :book5:
-        :isAliveMother:
-        :isAliveFather:
-        :isAliveHeir:
-        :isAliveSpouse:
-        :isMarried:
-        :isNoble:
-        :age:
-        :numDeadRelations:
-        :boolDeadRelations:
-        :isPopular:
-        :popularity:
-        :isAlive:
-        """
-        return pd.read_csv(self.dir + 'character-predictions.csv', sep=',', header=0)
 
 class IMDB:
 
     def __init__(self):
-        self.parentID = 'tt0944947'
         self.data_dir = '../data/'
         self.uri = 'https://datasets.imdbws.com/'
 
-    def actor_basics(self, nconst):
+    def get_file(self, file):
+        file_path = self.data_dir + file
+        if not path.exists(file_path):
+            r = requests.request('get', self.uri + file, allow_redirects=True)
+            open(file_path, 'wb').write(r.content)
+        return pd.read_table(self.data_dir + file, sep='\t', header=0)
+
+    def actor_basics(self):
         """
         Parameters:
-        :nconst:            unique identifier
 
         Returns:
         :nconst:            unique identifier
@@ -135,9 +31,7 @@ class IMDB:
         :knownForTitles:    titles the person is known for
         """
         file = 'name.basics.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df =  pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['nconst'] == nconst].to_dict('records')[0]
+        return self.get_file(file)
 
     def title_akas(self):
         """
@@ -154,11 +48,9 @@ class IMDB:
         :isOriginalTitle:   boolean {0 not original, 1 original}
         """
         file = 'title.akas.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == self.id].to_dict('records')
+        return self.get_file(file)
 
-    def title_basics(self, EID):
+    def title_basics(self):
         """
         Parameters:
 
@@ -174,14 +66,11 @@ class IMDB:
         :genres:            top-3 genres associated with the tile
         """
         file = 'title.basics.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == EID].to_dict('records')[0]
+        return self.get_file(file)
 
-    def crew(self, EID):
+    def crews(self):
         """
         Parameters:
-        :episode:           tconst unique identifier
 
         Returns:
         :tconst:            unique identifier
@@ -189,14 +78,11 @@ class IMDB:
         :writers:           writers of the given titles
         """
         file = 'title.crew.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == EID].to_dict('records')
+        return self.get_file(file)
 
-    def episode(self, EID):
+    def episodes(self):
         """
         Parameters:
-        :episode:           tconst unique identifier
 
         Returns:
         :tconst:            unique identifer
@@ -205,42 +91,33 @@ class IMDB:
         :episodeNumber:     episode number of the tconst in the TV series
         """
         file = 'title.episode.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == EID].to_dict('records')[0]
+        return self.get_file(file)
 
-    def principals(self, EID):
+    def principals(self):
         """
         Parameters:
-        :episode:           unique identifier
 
         Returns:
         :tconst:            unique identifier
         :principalCast:     array of nconst
         """
         file = 'title.principals.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == EID].to_dict('records')
+        return self.get_file(file)
 
-    def cast(self, EID):
+    def casts(self):
         """
         Parameters:
-        :episode:           unique identifier
 
         Returns:
         :tconst:            unique identifier
         :principalCast:     array of nconst
         """
         file = 'title.principals.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[(df['tconst'] == EID) & df['category'].isin(('actor', 'actress'))].to_dict('records')
+        return self.get_file(file)
 
-    def rating(self, EID):
+    def ratings(self):
         """
         Parameters:
-        :episode:           tconst unique identifier
 
         Returns:
         :tconst:            unique identifier
@@ -248,20 +125,94 @@ class IMDB:
         :numVotes:          number of votes the title has received
         """
         file = 'title.ratings.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        return df.loc[df['tconst'] == EID].to_dict('records')[0]
+        return self.get_file(file)
 
-    def all_episodes(self):
+class IceAndFire:
+
+    def __init__(self):
+        self.data_dir = '../data/'
+
+    def get_file(self, file, uri):
+        file_path = self.data_dir + file
+        if not path.exists(file_path):
+            r = requests.request('get', uri)
+            with open(file_path, 'w') as out:
+                json.dump(r.json(), out)
+        return pd.read_json(self.data_dir + file)
+
+    def houses(self):
         """
         Parameters:
 
         Returns:
-        :tconst:           array of all GOT epidosdes
+        :url:
+        :name:
+        :region:
+        :coatOfArms:
+        :words:
+        :titles:
+        :seats:
+        :currentLord:
+        :heir:
+        :overlord:
+        :founded:
+        :founder:
+        :diedOut:
+        :ancestralWeapons:
+        :cadetBranches:
+        :swornMembers:
         """
-        file = 'title.episode.tsv.gz'
-        get_file(self.uri, self.data_dir, file)
-        df = pd.read_table(self.data_dir + file, sep='\t', header=0)
-        df = df.loc[df['parentTconst'] == self.parentID]
-        return df['tconst'].tolist()
+        uri = 'https://anapioficeandfire.com/api/houses/'
+        file = 'houses.json'
+        return self.get_file(file, uri)
 
+    def book(self):
+        """
+        Parameters:
+
+        Returns:
+        :url:
+        :name:
+        :authors:
+        :publisher:
+        :country:
+        :mediaType:
+        :released:
+        :characters:        A list of the uri for each character
+
+        """
+        file = 'book.json'
+        uri = 'https://www.anapioficeandfire.com/api/books/1'
+        return self.get_file(file, uri)
+
+    def character(self, name):
+        """
+        Parameter:
+        :CID:           String              
+
+        Returns:
+        :url:           String              The hypermedia URL of this resource
+        :name:          String              The name of this character
+        :gender:        String              The gender of this character
+        :culture:       String              The culture that this character belongs to
+        :born:          String              Textual representation of when and where this character was born
+        :died:          String              Textual representation of when and where this character died
+        :titles:        Array of Strings    The titles that this character goes by
+        :alaiases:      Array of Strings    The aliases that this character goes by
+        :father:        String              The character resource URL of this character's father
+        :mother:        String              The character resource URL of this character's mother
+        :spouse:        String              An array of character resource URLs that has had a POV-chapter in this book
+        :allegiances:   Array of Strings    An array of House resource URLs that this character is loyal to
+        :books:         Array of Strings    An array of Book resource URLs that this character has been in
+        :povBooks:      Array of Strings    An array of Book resource URLs that this character has had a a POV-chapter in
+        :tvSeries:      Array of Strings    An array of names of the seasons of Game of Thrones that this character has been in
+        :playedBy:      Array of Strings    An array of actor names that has played this character in the TV show Game of Thrones
+        """
+        file = string(name) + '.json'
+        uri = 'https://www.anapioficeandfire.com/api/characters/?name=<name>'
+        return self.get_file(file, uri)
+
+
+if __name__ == '__main__':
+    imdb = IMDB()
+    imdb.download('title.ratings.tsv.gz')
