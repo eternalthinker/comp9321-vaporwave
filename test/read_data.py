@@ -7,7 +7,7 @@ DB_DIR = '../db'
 sys.path.append(DATA_DIR)
 sys.path.append(DB_DIR)
 
-import datasets
+import imdb_got
 
 
 # URI_KAGGLE = 'http://'
@@ -19,8 +19,7 @@ import datasets
 
 
 # kaggle = datasets.KAGGLE()
-imdb = datasets.IMDB()
-kaggle = datasets.KAGGLE()
+imdb = imdb_got.IMDB()
 
 # episode = 'tt1480055' 
 # cast = imdb.cast(episode)
@@ -74,4 +73,5 @@ EID = 'tt1480055'
 #     print(tuple(data.values()))
 
 
-print(kaggle.battles())
+# print(kaggle.battles())
+print(imdb.rating(EID))

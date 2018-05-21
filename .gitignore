@@ -210,7 +210,7 @@ typings/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -373,3 +373,7 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/vim,node,linux,macos,python,windows,sublimetext,pycharm+all,intellij+all
+
+*.csv
+*.tsv
+*.gz

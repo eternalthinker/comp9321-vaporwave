@@ -8,7 +8,7 @@ import json
 class IMDB:
 
     def __init__(self):
-        self.data_dir = '../data/'
+        self.data_dir = '../data/imdb/'
         self.uri = 'https://datasets.imdbws.com/'
 
     def get_file(self, file):
@@ -130,7 +130,7 @@ class IMDB:
 class IceAndFire:
 
     def __init__(self):
-        self.data_dir = '../data/'
+        self.data_dir = '../data/iceandfire/'
 
     def get_file(self, file, uri):
         file_path = self.data_dir + file
