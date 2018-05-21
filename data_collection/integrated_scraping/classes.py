@@ -28,7 +28,7 @@ class Character:
 	def __init__(self, name, url=""):
 		self.name = self.clean_name(name)
 		self.quotes = []		# List of Quote objects for every quote the character says (or is part of, in conversation)
-		self.url = url			# The imdb URL could be scraped for each character, if this is useful
+		self.url = url			# The imdb URL could be scraped for each character, if this is useful(e.g. for pics)
 		self.episodes = []		# Episodes that the character is in, list of imdb episode ids. 
 		self.played_by = ""
 		self.slug = generate_slug(name)
@@ -36,6 +36,7 @@ class Character:
 		self.episode_of_death = 0
 		self.means_of_death = ""
 		self.role = ""
+		self.killed_by = ""		# This is currently not used, but should make a field in db just in case
 
 	def clean_name(self, name):
 		name = re.sub(r'\n', '', name).strip()
@@ -111,7 +112,7 @@ def generate_slug(name):
 	name = re.sub(r'^Pyp$', 'Pypar', name)					# Nicknames
 	name = re.sub(r'^Lem$', 'Lem Lemoncloak', name)			# Nicknames
 	name = re.sub(r'^The Mountain$', 'Gregor Clegane', name)# Nicknames
-	name = re.sub(r'Weg Wun Dar', '', name)					# Nicknames
+	name = re.sub(r'Weg Wun Dar', '', name)					# Nicknames (Wun Weg Wun Dar Wun -> wun_wun)
 	name = re.sub(r'Robin Arryn', 'Robert Arryn', name)		# Series/book discrepancy
 	name = re.sub(r'Florel', 'Forel', name)					# typos
 	name = re.sub(r'[^a-zA-Z0-9 ]+', '', name).strip()		# Remove random characters, e.g. apostrophe, hash.
