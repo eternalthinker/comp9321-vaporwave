@@ -4,33 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
-class Episodes(Base):
-    __tablename__ = 'episodes'
-    EID = Column(String, primary_key=True)
-    tconst = Column(String)
-    seasonNumber = Column(String)
-    episodeNumber = Column(String)
-    title = Column(String)
-    averageRating = Column(Real)
-    numVotes = Column(Integer)
-    duration = Column(Integer)
-
-    def __repr__(self):
-        return {'EID': self.EID, 'tconst': self.tconst,
-                'seasonNumber': self.seasonNumber,
-                'episodeNumber': self.episodeNumber, 'title': self.title,
-                'averageRating': self.averageRating, 'numVotes': self.numVotes,
-                'duration', self.duration}
-
-
-class EpisodeCharacters(Base):
-    __tablename__ = 'episodecharacters'
-    EID = Column(String)
-    CID = Column(String)
-
-    def __repr__(self):
-        return {'EID': self.EID, 'CID': self.CID}
-
 
 class Characters(Base):
     __tablename__ 'characters'
