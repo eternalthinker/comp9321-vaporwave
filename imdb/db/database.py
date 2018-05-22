@@ -24,9 +24,9 @@ class Episodes(Base):
 
 
 class EpisodeCharacters(Base):
-    __tablename__ = 'episodecharacters'
-    EID = Column(String)
-    CID = Column(String)
+    __tablename__ = 'episode_characters'
+    EID = Column(String, ForeignKey('episodes.EID'), nullable=False)
+    CID = Column(String, ForeignKey('characters.CID'), nullable=False)
 
     def __repr__(self):
         return {'EID': self.EID, 'CID': self.CID}
@@ -36,42 +36,34 @@ class Characters(Base):
     __tablename__ 'characters'
     CID = Column(String, primary_key=True)
     name = Column(String)
-    gender = Column(String)
-    culture = Column(String)
-    title = Column(String)
-    aliases = Column(String)
-    father = Column(String)
-    mother = Column(String)
-    spouse = Column(String)
-    allegiances = Column(String)
-    seasons = Column(String)
+    url = Column(String)
     actor = Column(String)
+    episode_of_death = Column(String)
+    means_of_death = Column(String)
+    role = Column(String)
+    killed_by = Column(String)
 
     def __repr__(self):
-        return {'CID': self.CID, 'name': self.name, 'gender': self.gender,
-                'culture': self.culture, 'title': self.title,
-                'aliases': self.aliases, 'father': self.father,
-                'mother': self.mother, 'spouse': self.spouse,
-                'allegiances': self.allegiances, 'seasons', self.seasons,
-                'actor':, self.actor}
+        return {'CID': self.CID, 'name': self.name, 'url': self.url,
+                'actor': self.actor, 'episode_of_death ':self.episode_of_death, 
+                'means_of_death': self.means_of_death, 'role': role,
+                'killed_by': self.killed_by}
 
 
-class Houses(Base):
-    __tablename__ = 'houses'
-    HID = Column(String, primary_key=True)
-    name = Column(String)
-    region = Column(String)
-    coatOfArms = Column(String)
-    words = Column(String)
-    titles = Column(String)
-    seats = Column(String)
-    currentLord = Column(String)
-    overlord = Column(String)
-    swornMembers = Column(String)
+class Quotes(Base):
+    __tablename__ = 'quotes'
+    QID = Column(String, primary_key=True)
+    EID = Column(String, ForeignKey('episodes.EID'))
+    quote_text = Column(String)
 
     def __repr__(self):
-        return {'HID': self.HID, 'name': self.name, 'region': self.region,
-                'coatOfArms': self.coatOfArms, 'words': self.words,
-                'titles': self.titles, 'seats': self.seats,
-                'currentLord': self.currentLord, 'overlord': self.overlord,
-                'swornMembers': self.swornMembers}
+        return {'QID': self.QID, 'EID': self.EID, 'quote_text': self.quote_text}
+
+
+class CharacterQuotes(Base):
+    __tablename__ = 'character_quotes'
+    CID = Column(String, ForeignKey('characters.CID'))
+    QID = Column(String, ForeignKey('quotes.QID'))
+
+    def __repr__(self):
+        return {'CID': self.CID, 'QID': self.QID}
