@@ -23,6 +23,7 @@ def scrape_quotes(episode_id):
 	# Quotes are contained in divs with class "sodatext"
 	# For the purposes of this, each "sodatext" is a quote, even if it contains a conversation with several characters.
 	# If it's a conversation, the "quote" is attributed to each of them.
+	i = 1
 	for quote_div in soup.find_all("div", class_="sodatext"):
 
 		quote_characters = []
@@ -92,7 +93,9 @@ def scrape_quotes(episode_id):
 
 
 		# Add full quote to all_quotes
-		new_quote = Quote(full_quote_string, quote_characters, episode_id)
+		quote_id = episode_id + "-" + str(i)
+		i = i+1
+		new_quote = Quote(full_quote_string, quote_characters, episode_id, quote_id)
 		all_quotes.append(new_quote)
 
 		# Add quote object to each character involved in the quote
@@ -107,7 +110,7 @@ def scrape_quotes(episode_id):
 		print("")
 		print("Characters in the quote: " + str(quote_characters))
 		print("")
-		print("HTML quote")
+		print("HTML quote: ID " + quote_id)
 		print(full_quote_string)
 		print("----------------------------------------")
 		print("")

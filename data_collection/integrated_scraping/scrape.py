@@ -4,6 +4,8 @@ from scrape_quotes import *
 from scrape_characters import *
 from scrape_deaths import *
 
+# call "scrape characters, get the characters back"
+
 # Usage: python3 imdb_soup.py [episode id] [quotes||chars]
 # Episode id is optional, in case you just want to scrape one ID
 
@@ -36,7 +38,7 @@ episode_ids_large_test = ['tt3060910', 'tt3658012', 'tt3658014', 'tt3846626', 't
 if len(sys.argv) < 2:
 
 	# Scrape quotes
-	for e_id in episode_ids:
+	for e_id in episode_ids_test:
 		scrape_quotes(e_id)
 		time.sleep(randint(1, 2))
 		scrape_characters(e_id)
@@ -102,8 +104,6 @@ for e in all_episodes:
 	# for c in e.characters:
 	# 	print(c, end=", ")
 	# print("]")
-	print("length: " + str(len(e.characters)))
-
 
 
 

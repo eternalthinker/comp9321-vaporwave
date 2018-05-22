@@ -66,7 +66,8 @@ class Character:
 
 # Quote class
 class Quote:
-	def __init__(self, quote_text, characters, quote_episode):
+	def __init__(self, quote_text, characters, quote_episode, quote_id):
+		self.id = quote_id
 		self.quote_text = quote_text
 		self.quote_episode = quote_episode	# quote_episode is the episode id, e.g. tt3658014
 		self.length = 0						# this attribute could be computed if some quotes too long to display
