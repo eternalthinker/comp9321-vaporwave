@@ -50,8 +50,3 @@ def create_episode(season_num, episode_num):
 def get_quotes(season_num, episode_num):
 				q = QuotesList(season_num, episode_num)
 				return q
-
-
-
-if __name__ == '__main__':
-				app.run(port=1337)
