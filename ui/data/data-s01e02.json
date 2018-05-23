@@ -1,0 +1,44 @@
+[
+	{
+		"slug": "jon_snow",
+		"name": "Jon Snow",
+		"house": "Stark",
+		"num_episodes": 7,
+		"is_alive": true
+	},
+	{
+		"slug": "tyrion",
+		"name": "Tyrion",
+		"house": "Lannister",
+		"num_episodes": 3,
+		"is_alive": true
+	},
+	{
+		"slug": "missandei",
+		"name": "Missandei",
+		"house": "Targaryen",
+		"num_episodes": 2,
+		"is_alive": true
+	},
+	{
+		"slug": "drogo",
+		"name": "Khal Drogo",
+		"house": "Dothraki",
+		"num_episodes": 4,
+		"is_alive": false
+	},
+	{
+		"slug": "sansa",
+		"name": "Sansa Stark",
+		"house": "Stark",
+		"num_episodes": 4,
+		"is_alive": true
+	},
+	{
+		"slug": "cersei",
+		"name": "Cersei Lannister",
+		"house": "Lannister",
+		"num_episodes": 3,
+		"is_alive": true
+	}
+]

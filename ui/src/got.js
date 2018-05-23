@@ -33,8 +33,8 @@ function episodeChart() {
     .range(['#ffffff', '#000000']);
 
   const fillColor = d3.scaleOrdinal()
-    .domain(['stark', 'targaryen', 'lannister'])
-    .range(['#d84b2a', '#beccae', '#7aa25c']);
+    .domain(['stark', 'targaryen', 'lannister', 'dothraki'])
+    .range(['#d84b2a', '#beccae', '#7aa25c', '#cccccc']);
 
   function createNodes(rawData) {
     const maxEpisodes = d3.max(rawData, (d) => +d.num_episodes);
@@ -66,6 +66,9 @@ function episodeChart() {
   const chart = function chart(selector, rawData) {
     nodes = createNodes(rawData);
 
+    if (svg) {
+      d3.selectAll("svg").remove();
+    }
     svg = d3.select(selector)
       .append('svg')
       .attr('width', width)
@@ -145,6 +148,19 @@ function display(data) {
   gotChart('#vis', data);
 }
 
-fetch('data/data.json')
-  .then(res => res.json())
-  .then(json => display(json));
+$(document).ready(function () {
+
+  $(".button").click(function (event) {
+    event.preventDefault();
+    $(this).toggleClass('active').siblings().removeClass('active');
+    const buttonId = $(this).attr('id');
+    fetch(`data/data-${buttonId}.json`)
+      .then(res => res.json())
+      .then(json => display(json));
+  });
+
+  fetch(`data/data-s01e01.json`)
+    .then(res => res.json())
+    .then(json => display(json));
+
+});
