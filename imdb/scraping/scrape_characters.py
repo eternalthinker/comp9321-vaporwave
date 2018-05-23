@@ -60,7 +60,7 @@ def scrape_characters(episode_id):
 			e = get_episode_by_id(episode_id)
 			e.add_character(char_name)
 
-
+	return e
 
 
 

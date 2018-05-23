@@ -86,7 +86,7 @@ class IMDB:
 
         Returns:
         :tconst:            unique identifer
-        :parentTconst:      unique identifier
+        :parentTconst:      unique identifier parent
         :seasonNumber:      season number the episode belongs to
         :episodeNumber:     episode number of the tconst in the TV series
         """
