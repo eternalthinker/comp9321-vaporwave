@@ -5,6 +5,7 @@ from sqlite3 import Error
 from scrape_deaths import scrape_deaths
 from classes import generate_slug
 from scrape_characters import scrape_characters
+from scrape_quotes import scrape_quotes
 
 
 def create_connection(db_file):
@@ -70,6 +71,11 @@ def db_has_character(conn, value):
 	cur.execute(q, value)
 	return (cur.fetchone() is not None)
 
+def execute_query(conn, q, value):
+	cur = conn.cursor()
+	cur.execute(q, value)
+	return cur
+
 def populate_deaths(conn):
 	for death in scrape_deaths():
 		value = tuple([generate_slug(death[0])]) + death
@@ -83,14 +89,32 @@ def main():
 	for episode_info in episodes:
 		eid, tconst, season, episode = episode_info[:4]
 		print("Processing Season {} Episode {} ...".format(season, episode))
+
+		quotes = scrape_quotes(tconst)
+		for quote in quotes:
+			q = '''INSERT INTO quotes (QID, EID, quote_text) VALUES(?, ?, ?)'''
+			execute_query( conn, q, (quote["id"], eid, quote["text"]) )
+			quote_characters = quote['characters']
+			quote_characters = [generate_slug(character) for character in quote_characters]
+			for slug in quote_characters:
+				q = '''INSERT INTO character_quotes (CID, QID) VALUES(?, ?)'''
+				execute_query( conn, q, (slug, quote["id"]) )
+
 		characters = scrape_characters(tconst)
+		ep_slugs = set()
 		for character in characters:
 			name, actor = character
 			slug = generate_slug(name)
+			if slug in ep_slugs:
+				print("Repeating slug in episode:", slug, name)
+				continue
+			ep_slugs.add(slug)
 			if db_has_character(conn, (slug,)):
 				update_character(conn, (actor, slug))
 			else:
 				insert_new_character(conn, (slug, name, actor))
+			q = '''INSERT INTO episode_characters (EID, CID) VALUES(?, ?)'''
+			execute_query(conn, q, (eid, slug))
 
 	conn.commit()
 	conn.close()

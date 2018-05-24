@@ -6,7 +6,7 @@ from classes import *
 def scrape_characters(episode_id):
 
 	if episode_id == "test":
-		episode_id = "tt5655178"
+		episode_id = "tt2085239"
 		html_file = open("test_characters.html", 'r')		# This is tt5655178
 		soup = BeautifulSoup(html_file, "lxml")
 		html_file.close()

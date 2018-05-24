@@ -5,7 +5,7 @@ from pathlib import Path
 from classes import *
 
 def scrape_quotes(episode_id):
-
+	quotes_list = []
 	if episode_id == "test":
 		episode_id = "tt5655178"
 		html_file = open("test.html", 'r')		# This is tt5655178
@@ -17,7 +17,7 @@ def scrape_quotes(episode_id):
 		data = r.text
 		soup = BeautifulSoup(data, "lxml")
 
-	print("\n\n\n\n")
+	#print("\n\n\n\n")
 
 	# Iterate through quotes and scrape attributes
 	# Quotes are contained in divs with class "sodatext"
@@ -54,9 +54,9 @@ def scrape_quotes(episode_id):
 				full_quote_string += html
 
 				# Testing
-				print(character_name_string, end=": ")
-				print("[" + setting_string, end="] ")
-				print(quote_string)
+				# print(character_name_string, end=": ")
+				# print("[" + setting_string, end="] ")
+				# print(quote_string)
 
 			# In this case, there is a quote with no extra info, e.g. "Arya Stark: That's not you.""
 			# If this is the case, the quote is at contents[2]
@@ -76,8 +76,8 @@ def scrape_quotes(episode_id):
 				full_quote_string += html
 
 				# Testing
-				print(character_name_string, end=": ")
-				print(quote_string)
+				# print(character_name_string, end=": ")
+				# print(quote_string)
 
 				
 			# In this case, it's just setting info, e.g. "[Randyll and Dickon turn to Jaime]"
@@ -89,7 +89,7 @@ def scrape_quotes(episode_id):
 				full_quote_string += html
 
 				# Testing
-				print("[" + setting_string + "]")
+				#print("[" + setting_string + "]")
 
 
 		# Add full quote to all_quotes
@@ -97,6 +97,12 @@ def scrape_quotes(episode_id):
 		i = i+1
 		new_quote = Quote(full_quote_string, quote_characters, episode_id, quote_id)
 		all_quotes.append(new_quote)
+
+		quotes_list.append({
+			'text': full_quote_string,
+			'id': quote_id,
+			'characters': quote_characters
+		})
 
 		# Add quote object to each character involved in the quote
 		for char_name in quote_characters:
@@ -107,10 +113,15 @@ def scrape_quotes(episode_id):
 				print("***********something wrong, that character doesn't exist***************")
 
 		# Testing
-		print("")
-		print("Characters in the quote: " + str(quote_characters))
-		print("")
-		print("HTML quote: ID " + quote_id)
-		print(full_quote_string)
-		print("----------------------------------------")
-		print("")
+		# print("")
+		# print("Characters in the quote: " + str(quote_characters))
+		# print("")
+		# print("HTML quote: ID " + quote_id)
+		# print(full_quote_string)
+		# print("----------------------------------------")
+		# print("")
+	return quotes_list
+
+
+if __name__ == "__main__":
+	print(scrape_quotes('tt1480055'))
