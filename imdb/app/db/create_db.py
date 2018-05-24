@@ -1,3 +1,5 @@
+import sys
+
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -21,6 +23,9 @@ parentTconst = 'tt0944947'
 all_episodes = episodes.loc[episodes['parentTconst']==parentTconst]
 all_episodes = all_episodes['tconst'].tolist()
 
+episode_ids_test = ['tt1480055', 'tt1668746', 'tt1829962'] 
+
+# for ep in episode_ids_test:
 for ep in all_episodes:
 
     title = titles.loc[titles['tconst']==ep].to_dict('records')[0]
@@ -28,9 +33,9 @@ for ep in all_episodes:
     rating = ratings.loc[ratings['tconst']==ep].to_dict('records')
 
     if rating:
-      rating = rating[0]
-      averageRating = rating['averageRating']
-      numVotes = rating['numVotes']
+        rating = rating[0]
+        averageRating = rating['averageRating']
+        numVotes = rating['numVotes']
     else:
         averageRating = 0
         numVotes = 0
@@ -53,6 +58,9 @@ for ep in all_episodes:
                    numVotes=numVotes,
                    duration=title['runtimeMinutes']
                    )
+
+    # characters = scrape_characters(ep)
+    # print(characters)
 
     session.add(eps)
     session.commit()
