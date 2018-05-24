@@ -3,6 +3,9 @@ from random import randint
 from scrape_quotes import *
 from scrape_characters import *
 from scrape_deaths import *
+from add_to_db import *
+
+sys.path.insert(0, '../db') 
 
 # call "scrape characters, get the characters back"
 
@@ -106,20 +109,10 @@ for e in all_episodes:
 	# print("]")
 
 
+# Add data to the db
+# (see add_to_db.py)
+add_to_db()
 
-# TODO: Itay to add db insertion logic here 
-# Look at classes.py to see the attributes of these objects
-for c in all_characters:
-	# Insert attributes into db
-	print("", end="")
-
-for q in all_quotes:
-	# Insert attributes into db
-	print("", end="")
-
-for e in all_episodes:
-	# Insert attributes into db
-	print("", end="")
 
 
 
