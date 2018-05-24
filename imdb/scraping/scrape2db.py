@@ -78,7 +78,7 @@ def populate_deaths(conn):
 
 def main():
 	conn = create_connection('imdb.db')
-	# populate_deaths(conn)
+	populate_deaths(conn)
 	episodes = get_episodes(conn)
 	for episode_info in episodes:
 		eid, tconst, season, episode = episode_info[:4]
