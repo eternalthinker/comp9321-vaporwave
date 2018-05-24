@@ -7,11 +7,6 @@ from sqlalchemy.orm import sessionmaker
 from database import *
 from datasets import IMDB
 
-SCRAPE_DIR = '../scraping/'
-sys.path.append(SCRAPE_DIR)
-
-from scrape_characters import scrape_characters
-
 engine = create_engine('sqlite:///imdb.db', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()

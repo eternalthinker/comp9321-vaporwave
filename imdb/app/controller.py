@@ -1,8 +1,6 @@
 from flask import jsonify
 from flask_restful import reqparse
 
-import json
-
 from app.database import  init_db, db_session
 from app.models import *
 
@@ -15,11 +13,11 @@ def episode():
     args = parser.parse_args()
     eid = args.get("EID")
 
-    r = Episode.query.filter(Episode.EID == '0101')[0]
+    r = Episode.query.filter(Episode.EID == eid)[0]
 
     if r:
         record = dict(r.__dict__)
         record.pop('_sa_instance_state')
         return jsonify(record), 200
 
-    return "", 404
+    return "Episode Not Found", 404
