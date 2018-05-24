@@ -19,9 +19,11 @@ def scrape_characters(episode_id):
 	# Get episode info
 	title_link = soup.find("a", class_="subnav_heading")
 	episode_title = title_link.contents[0].strip()
-	print("Episode title: " + episode_title)
+	#print("Episode title: " + episode_title)
 	e = Episode(episode_title, episode_id)
-	all_episodes.append(e)
+	# all_episodes.append(e)
+
+	characters = []
 
 	# Characters are contained in table rows within cast_list
 	for table in soup.find_all("table", class_="cast_list"):
@@ -38,11 +40,15 @@ def scrape_characters(episode_id):
 				else:
 					char_name = name_row.contents[0]
 				char_name = re.sub(r'\(.*\)', '', char_name).strip() #remove bracketed info about character
-				print("Character: " + char_name)
+				#print("Character: " + char_name)
 
+			actor_name = None
 			if char_row.find("span", class_="itemprop"):
 				actor_name = char_row.find("span", class_="itemprop").contents[0].strip()
-				print("Played by: " + actor_name)
+				#print("Played by: " + actor_name)
+
+			if char_name != "":
+				characters.append((char_name, actor_name))
 
 			# Either add episode info to existing character object, or create new character with episode info
 			character = get_character_by_name(char_name)
@@ -57,10 +63,13 @@ def scrape_characters(episode_id):
 					all_characters.append(character)
 
 			# Add character to the episode's character list (added as a slug)
-			e = get_episode_by_id(episode_id)
+			#e = get_episode_by_id(episode_id)
 			e.add_character(char_name)
 
-	return e
+	return characters
+
+if __name__ == "__main__":
+	print(scrape_characters('tt1480055'))
 
 
 

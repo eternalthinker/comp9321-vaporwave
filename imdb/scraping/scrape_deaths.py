@@ -44,15 +44,21 @@ def scrape_deaths():
 		means_of_death = details[2].contents[1].strip()
 
 		# Find character in memory
-		c = get_character_by_name(name)
+		# c = get_character_by_name(name)
 
-		if not c:
-			print(name + " from Times deaths not found in characters for given episodes----------------")
-		else:
-			c.set_season_of_death(season_of_death)
-			c.set_episode_of_death(episode_of_death)
-			c.set_means_of_death(means_of_death)
-			c.set_role(role)
+		# if not c:
+		# 	print(name + " from Times deaths not found in characters for given episodes----------------")
+		# else:
+		# 	c.set_season_of_death(season_of_death)
+		# 	c.set_episode_of_death(episode_of_death)
+		# 	c.set_means_of_death(means_of_death)
+		# 	c.set_role(role)
+
+		yield (name, season_of_death, episode_of_death, means_of_death, role)
+
+if __name__ == "__main__":
+	for death in scrape_deaths():
+		print (death)
 
 
 
