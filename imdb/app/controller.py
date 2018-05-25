@@ -118,3 +118,12 @@ def characters_quotes(cid):
             character_quote.append(c)
         return jsonify(character_quote), 200
     return "Complete and Catastrophic Character Failure"
+
+
+@app.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = "Content-Type, x-access-token, Accept"
+    header['Access-Control-Allow-Methods'] = "GET, POST, DELETE"
+    return response
