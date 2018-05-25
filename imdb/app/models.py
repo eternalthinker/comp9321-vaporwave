@@ -67,12 +67,3 @@ class CharacterQuotes(Base):
 
     def __repr__(self):
         return {'CID': self.CID, 'QID': self.QID}
-
-
-class EpisodeQuotes(Base):
-    __tablename__ = 'episode_quotes'
-    EID = Column(String, ForeignKey('episodes.EID'), primary_key=True)
-    QID = Column(String, ForeignKey('quotes.QID'), primary_key=True)
-
-    def __repr__(self):
-        return {'EID': self.EID, 'QID': self.QID}

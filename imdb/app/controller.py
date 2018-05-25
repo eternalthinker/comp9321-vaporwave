@@ -35,7 +35,6 @@ def character(cid):
 def episode_characters(sid, eid):
     ceid = seid(sid, eid)
     cs = Character.query.outerjoin(EpisodeCharacters).filter(EpisodeCharacters.EID == ceid)
-
     if cs:
         ep_characters = []
         for c in cs:
@@ -43,4 +42,31 @@ def episode_characters(sid, eid):
             c.pop('_sa_instance_state')
             ep_characters.append(c)
         return jsonify(ep_characters), 200
-    return "Complete and Catastrophic Failure"
+    return "Complete and Catastrophic Character Failure"
+
+
+@app.route('/season/<sid>/episode/<eid>/quotes', methods=['GET'])
+def episode_quotes(sid, eid):
+    qeid = seid(sid, eid)
+    qs = Quote.query.filter(Quote.EID == qeid)
+    if qs:
+        ep_quotes = []
+        for q in qs:
+            q = dict(q.__dict__)
+            q.pop('_sa_instance_state')
+            ep_quotes.append(q)
+        return jsonify(ep_quotes), 200
+    return "Complete and Catastrophic Quote Failure"
+
+
+@app.route('/character/<cid>/quotes', methods=['GET'])
+def characters_quotes(cid):
+    cs = Quote.query.outerjoin(CharacterQuotes).filter(CharacterQuotes.CID == cid)
+    if cs:
+        character_quote = []
+        for c in cs:
+            c = dict(c.__dict__)
+            c.pop('_sa_instance_state')
+            character_quote.append(c)
+        return jsonify(character_quote), 200
+    return "Complete and Catastrophic Character Failure"
