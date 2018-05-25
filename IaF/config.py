@@ -8,6 +8,6 @@ class Config(object):
     # DATABASE_DIR = os.path.join(ROOT_DIR, 'db')
     # SCRAPING_DIR = os.path.join(ROOT_DIR, 'scraping')
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + ROOT_DIR + '/IaF.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + ROOT_DIR + '/got.db'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False

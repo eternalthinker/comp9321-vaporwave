@@ -1,7 +1,8 @@
-from flask import jsonify
+from flask import jsonify, request
 
 from app import app
 from app.models import *
+from app.database import engine
 
 
 def seid(sid, eid):
@@ -10,9 +11,19 @@ def seid(sid, eid):
     return sid + eid
 
 
+@app.route('/characters', methods=['POST'])
+def get_characters():
+    slugs = request.get_json()
+    results = Character.query.filter(Character.slug.in_(slugs)).all()
+    characters = []
+    for result in results:
+        c = dict(result.__dict__)
+        c.pop('_sa_instance_state')
+        characters.append(c)
+    return jsonify(characters), 200
+
 @app.route('/character/<slug>', methods=['GET'])
 def character(slug):
-
     c = Character.query.filter(Character.slug == slug)[0]
     if c:
         c = dict(c.__dict__)
