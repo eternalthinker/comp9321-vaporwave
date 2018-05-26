@@ -37,22 +37,23 @@ function episodeChart() {
     .range(['#d84b2a', '#beccae', '#7aa25c', '#cccccc']);
 
   function createNodes(rawData) {
-    const maxEpisodes = d3.max(rawData, (d) => +d.num_episodes);
+    const maxEpisodes = d3.max(rawData, (d) => +d.episodeCount);
 
     const radiusScale = d3.scalePow()
       .exponent(0.5)
-      .range([2, 50])
+      .range([2, 30])
       .domain([0, maxEpisodes]);
 
     const myNodes = rawData.map((d) => {
       return {
-        slug: d.slug,
+        slug: d.CID,
         name: d.name,
-        house: d.house,
-        value: d.num_episodes,
-        id: d.slug,
-        isAlive: d.is_alive,
-        radius: radiusScale(+d.num_episodes),
+        actor: d.actor,
+        house: "Stark",
+        value: d.episodeCount,
+        id: d.CID,
+        isAlive: Boolean(d.isAlive),
+        radius: radiusScale(+d.episodeCount),
         x: Math.random() * 900,
         y: Math.random() * 800
       };
@@ -75,7 +76,7 @@ function episodeChart() {
       .attr('height', height);
 
     bubbles = svg.selectAll('.bubble')
-      .data(nodes, (d) => d.slug);
+      .data(nodes, (d) => d.CID);
 
     function aliveStatus(isAlive) {
       if (isAlive) {
@@ -126,8 +127,8 @@ function episodeChart() {
                   '<span class="name">House: </span><span class="value">' +
                   d.house +
                   '</span><br/>' +
-                  '<span class="name">Value: </span><span class="value">' +
-                  d.value +
+                  '<span class="name">Actor: </span><span class="value">' +
+                  d.actor +
                   '</span>';
     tooltip.showTooltip(content, d3.event);
   }
@@ -148,6 +149,76 @@ function display(data) {
   gotChart('#vis', data);
 }
 
+function loadEpisode(seasonNumber, episodeNumber) {
+  fetch(`http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/characters`)
+    .then(res => res.json())
+    .then(json => {
+      display(json);
+    });
+}
+
+function getEID(seasonNumber, episodeNumber) {
+  return `${("0" + seasonNumber).slice(-2)}${("0" + episodeNumber).slice(-2)}`;
+}
+
+function showTimelineProgress(seasonNumber, episodeNumber) {
+  $('.episode-step').removeClass('form-steps__item--active');
+  Array.from(Array(seasonNumber-1).keys()).forEach((s) => {
+    Array.from(Array(10).keys()).forEach((e) => {
+      const eid = getEID(s+1, e+1);
+      const stepEl = $(`#episode-step-${eid}`)
+      if (stepEl) {
+        stepEl.addClass('form-steps__item--active');
+      }
+    });
+  });
+  Array.from(Array(episodeNumber).keys()).forEach((e) => {
+    const eid = getEID(seasonNumber, e+1);
+    $(`#episode-step-${eid}`).addClass('form-steps__item--active');
+  });
+}
+
+function displayEpisodeTimeline(episodes) {
+  episodes = episodes.sort((e1, e2) => {
+    if (e1.seasonNumber === e2.seasonNumber) {
+      return +e1.episodeNumber - +e2.episodeNumber;
+    }
+    return +e1.seasonNumber - +e2.seasonNumber;
+  });
+
+  $episodeTimeline = $("#episode-timeline");
+
+  episodes.forEach((episode, i) => {
+    const episodeNumber = +episode.episodeNumber;
+    const seasonNumber = +episode.seasonNumber;
+    let seasonText = '.';
+    if (episodeNumber === 1) {
+      seasonText = `S${episode.seasonNumber}`;
+    }
+    $episodeStep = $(`<div id="episode-step-${episode.EID}" class="episode-step form-steps__item">
+        <div class="form-steps__item-content">
+          <span class="form-steps__item-icon">${episodeNumber}</span>
+          <span class="form-steps__item-line"></span>
+          <span class="form-steps__item-text">${seasonText}</span>
+        </div>
+      </div>`
+    );
+    if (i === 0) {
+      $episodeStep.addClass('form-steps__item--active');
+      $episodeStep.find('.form-steps__item-line').remove();
+    }
+
+    $episodeStep.click(event => {
+      loadEpisode(seasonNumber, episodeNumber);
+      showTimelineProgress(seasonNumber, episodeNumber);
+    });
+
+    $episodeTimeline.append($episodeStep)
+  });
+}
+
+
+
 $(document).ready(function () {
 
   $(".button").click(function (event) {
@@ -159,8 +230,14 @@ $(document).ready(function () {
       .then(json => display(json));
   });
 
-  fetch(`data/data-s01e01.json`)
+  fetch(`http://localhost:5000/episodes`)
     .then(res => res.json())
-    .then(json => display(json));
+    .then(json => displayEpisodeTimeline(json));
+
+  loadEpisode(1, 1);
+
+  /*fetch(`data/data-s01e01.json`)
+    .then(res => res.json())
+    .then(json => display(json));*/
 
 });
