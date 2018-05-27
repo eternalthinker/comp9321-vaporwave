@@ -2,7 +2,7 @@ from flask import jsonify
 
 from app import app
 from app.models import *
-from app.database import engine
+from app.database import engine, db_session
 
 
 def seid(sid, eid):
@@ -96,13 +96,19 @@ def episode_characters(sid, eid):
 @app.route('/season/<sid>/episode/<eid>/quotes', methods=['GET'])
 def episode_quotes(sid, eid):
     qeid = seid(sid, eid)
-    qs = Quote.query.filter(Quote.EID == qeid)
+    #qs = Quote.query.outerjoin(CharacterQuotes).filter(Quote.EID == qeid)
+    #qs = CharacterQuotes.query.outerjoin(Quote).filter(Quote.EID == qeid)
+    qs = db_session.query(CharacterQuotes.CID, Quote.QID, Quote.quote_text).outerjoin(Quote).filter(Quote.EID == qeid)
     if qs:
         ep_quotes = []
         for q in qs:
-            q = dict(q.__dict__)
-            q.pop('_sa_instance_state')
-            ep_quotes.append(q)
+            CID, QID, quote_text = q
+            q_dict = {
+                "CID": CID,
+                "QID": QID,
+                "quote_text": quote_text
+            }
+            ep_quotes.append(q_dict)
         return jsonify(ep_quotes), 200
     return "Complete and Catastrophic Quote Failure"
 

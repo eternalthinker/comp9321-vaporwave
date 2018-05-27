@@ -1,7 +1,7 @@
 
 function episodeChart() {
   const width = 940;
-  const height = 600;
+  const height = 550;
 
   const tooltip = floatingTooltip('character_tooltip', 240);
   const center = {
