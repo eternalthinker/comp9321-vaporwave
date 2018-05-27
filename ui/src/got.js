@@ -36,7 +36,16 @@ function episodeChart() {
 
   const fillColor = d3.scaleOrdinal()
     .domain(['stark', 'targaryen', 'lannister', 'dothraki'])
-    .range(['#d84b2a', '#beccae', '#7aa25c', '#cccccc']);
+    .range(['#d84b2a', '#beccae', '#efe40e', '#cccccc']);
+
+  function getHouse(allegiances) {
+    if (allegiances == 'NULL') {
+      return 'Other';
+    }
+    const houseTitle = allegiances.split(',')[0];
+    const house = houseTitle.split(' ')[1];
+    return house;
+  }
 
   function createNodes(rawData) {
     const maxEpisodes = d3.max(rawData, (d) => +d.episodeCount);
@@ -51,7 +60,7 @@ function episodeChart() {
         slug: d.CID,
         name: d.name,
         actor: d.actor,
-        house: "Stark",
+        house: getHouse(d.allegiances),
         value: d.episodeCount,
         id: d.CID,
         isAlive: Boolean(d.isAlive),
