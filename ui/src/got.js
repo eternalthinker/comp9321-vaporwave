@@ -34,9 +34,51 @@ function episodeChart() {
     .domain(['alive', 'dead'])
     .range(['#ffffff', '#000000']);
 
-  const fillColor = d3.scaleOrdinal()
-    .domain(['stark', 'targaryen', 'lannister', 'dothraki'])
-    .range(['#6b0848', '#a40a3c', '#ec610a', '#ffc300', '#f73859', '#404b69', '#00818a', '#658525', '#e7759a']);
+  const houseColorMappings = {
+    'targaryen': '#fc94aa',
+    'lannister': '#c26271',
+    'tully': '#add3fb',
+    'baratheon': '#feda95',
+    'tyrell': '#88d3d1',
+    'nymeros': '#fcba86',
+    'stark': '#d8d8d8',
+    'arryn': '#506c86',
+    'greyjoy': '#d8c5ad',
+    'other': '#6f6f6f',
+
+    'clegane': '#6b0848',
+    'reed': '#a40a3c',
+    'cassel': '#ec610a',
+    'mormont': '#ffc300',
+    'baelish': '#f73859',
+    'selmy': '#404b69',
+    'payne': '#00818a',
+    'tarly': '#6db193',
+    'stokeworth': '#e7759a',
+    'bolton': '#ba78cd',
+    'frey': '#409d9b'
+  };
+
+  let houseDomains = Object.keys(houseColorMappings);
+  let houseColorRange = [];
+  for (let key of houseDomains) {
+    houseColorRange.push(houseColorMappings[key]);
+  }
+
+  /*const fillColor = d3.scaleOrdinal()
+    .domain(houseDomains)
+    .range([...houseColorRange]);*/
+    /*, 
+      '#6b0848', '#a40a3c', '#ec610a', '#ffc300', 
+      '#f73859', '#404b69', '#00818a', '#658525', '#e7759a']);*/
+
+  const fillColor = (house) => {
+    house = house.toLowerCase();
+    if (!houseColorMappings.hasOwnProperty(house)) {
+      house = 'other';
+    } 
+    return houseColorMappings[house];
+  };
 
   function getHouse(allegiances) {
     if (allegiances == 'NULL') {
