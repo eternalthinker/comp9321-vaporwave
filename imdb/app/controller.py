@@ -53,7 +53,7 @@ def test(season, episode):
     for character in cs:
         character_dict = {}
         for pair in character.items():
-            character_dict = {**character_dict, **{pair[0]: pair[1]}}
+            character_dict[pair[0]] = pair[1]
         characters.append(character_dict)
     return jsonify(characters), 200
 

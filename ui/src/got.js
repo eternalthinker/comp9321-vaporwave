@@ -94,7 +94,11 @@ function episodeChart() {
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
       .on('mouseover', showDetail)
-      .on('mouseout', hideDetail);
+      .on('mouseout', hideDetail)
+      .call(d3.drag()
+        .on("drag", d => d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y))
+      )
+      ;
 
     bubbles = bubbles.merge(bubblesE);
 
