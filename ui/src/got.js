@@ -9,7 +9,7 @@ function episodeChart() {
     y: height /2
   };  
 
-  const forceStrength = 0.03;
+  const forceStrength = 0.06;
 
   let svg = null;
   let bubbles = null;
@@ -88,18 +88,37 @@ function episodeChart() {
       }
     }
 
+    function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+    
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    } 
+
     const bubblesE = bubbles.enter().append('circle')
       .classed('bubble', true)
-      .attr('r', 0)
+      //.attr('r', 0)
       .attr('fill', function (d) { return fillColor(d.house); })
       .attr('stroke', function (d) { return d3.rgb(fillColor(d.house)).darker(); })
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
       .on('mouseover', showDetail)
       .on('mouseout', hideDetail)
-      /*.call(d3.drag()
-        .on("drag", d => d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y))
-      )*/
+      .attr("r", function(d){  return d.r })
+      .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended))
       ;
 
     bubbles = bubbles.merge(bubblesE);
