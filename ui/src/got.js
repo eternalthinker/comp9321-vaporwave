@@ -24,6 +24,8 @@ function episodeChart() {
     .force('x', d3.forceX().strength(forceStrength).x(center.x))
     .force('y', d3.forceY().strength(forceStrength).y(center.y))
     .force('charge', d3.forceManyBody().strength(charge))
+    .force('link', d3.forceLink().id(function(d) { return d.index; }))
+    .force('collide', d3.forceCollide(d => d.r + 10).iterations(24))
     .on('tick', ticked);
 
   simulation.stop();
@@ -95,9 +97,9 @@ function episodeChart() {
       .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
       .on('mouseover', showDetail)
       .on('mouseout', hideDetail)
-      .call(d3.drag()
+      /*.call(d3.drag()
         .on("drag", d => d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y))
-      )
+      )*/
       ;
 
     bubbles = bubbles.merge(bubblesE);
