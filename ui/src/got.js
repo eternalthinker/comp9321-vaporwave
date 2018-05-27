@@ -36,7 +36,7 @@ function episodeChart() {
 
   const fillColor = d3.scaleOrdinal()
     .domain(['stark', 'targaryen', 'lannister', 'dothraki'])
-    .range(['#d84b2a', '#beccae', '#efe40e', '#cccccc']);
+    .range(['#6b0848', '#a40a3c', '#ec610a', '#ffc300', '#f73859', '#404b69', '#00818a', '#658525', '#e7759a']);
 
   function getHouse(allegiances) {
     if (allegiances == 'NULL') {
