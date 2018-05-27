@@ -149,12 +149,87 @@ function display(data) {
   gotChart('#vis', data);
 }
 
-function loadEpisode(seasonNumber, episodeNumber) {
-  fetch(`http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/characters`)
+function callApi({endpoint, method, data}) {
+  let params = {};
+  if (method === 'POST') {
+    params = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+  }
+  return fetch(endpoint, params)
     .then(res => res.json())
-    .then(json => {
-      display(json);
-    });
+    .then(json => json);
+}
+
+function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
+  const episodeCharactersMap = episodeCharacters.reduce((acc, charInfo) => {
+    acc[charInfo.CID] = charInfo;
+    return acc;
+  }, {});
+  
+  const characterQuotesMap = characterQuotes.reduce((acc, quote) => {
+    const slug = quote.CID;
+    if (!acc.hasOwnProperty(slug)) {
+      acc[slug] = [];
+    }
+    acc[slug].push(quote.quote_text);
+    return acc;
+  }, {});
+
+  const charactersIaFMap = charactersIaF.reduce((acc, charInfo) => {
+    acc[charInfo.slug] = charInfo;
+    return acc;
+  }, {});
+
+  const characters = charactersIaF.map(charInfo => {
+    const slug = charInfo.slug;
+    return {
+      ...charInfo,
+      ...episodeCharactersMap[slug],
+      quotes: characterQuotes[slug]
+    }
+  });
+
+  /*const characters = episodeCharacters.map(charInfo => {
+    const slug = charInfo.CID;
+    return {
+      ...charInfo,
+      ...charactersIaFMap[slug],
+      quotes: characterQuotesMap[slug]
+    }
+  });*/
+
+  return characters;
+}
+
+function loadEpisode(seasonNumber, episodeNumber) {
+  callApi({
+    endpoint: `http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/characters`,
+    method: 'GET'
+  })
+  .then(episodeCharacters => {
+    callApi({
+      endpoint: `http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/quotes`,
+      method: 'GET'
+    })
+    .then(characterQuotes => {
+      const characterList = episodeCharacters.map(charInfo => charInfo.CID);
+      callApi({
+        endpoint: `http://localhost:7000/characters`,
+        method: 'POST',
+        data: characterList
+      })
+      .then(charactersIaF => {
+        const characters = mashUp(episodeCharacters, characterQuotes, charactersIaF);
+        console.log(characters);
+        display(characters);
+      }); // IaF - characters
+    }); // IMDB - quotes
+  }); // IMDB - episode chars
 }
 
 function getEID(seasonNumber, episodeNumber) {
