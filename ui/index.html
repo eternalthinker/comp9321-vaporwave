@@ -16,13 +16,28 @@
 </head>
 <body>
   <div class="container-fluid">
-    <h2>The Timeline of Ice and Fire</h2>
-    <h5><small class="text-muted">A narrative of character changes across episodes in Game of Thrones TV series</small></h5>
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-9">
+        <h2>The Timeline of Ice and Fire</h2>
+        <h5>
+          <small class="text-muted">
+          A narrative of character changes across episodes in Game of Thrones TV series
+          </small>
+        </h5>
+      </div>
+      <div class="col-md-3">
+        <p class="force-buttons">
+          <button type="button" id="group-bubbles" class="btn btn-primary btn-sm">Group together</button>
+          <button type="button" id="split-bubbles" class="btn btn-primary btn-sm">Split by House</button>
+        </p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-9">
         <div id="vis"></div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <!-- Episode info -->
         <div class="episode">
           <h3 class="episode-title">loading...</h3>
@@ -43,7 +58,6 @@
             <p class="card-text character-quote">loading..</p>
           </div>
         </div>
-        <!-- Character death info -->
       </div>
       
     </div>

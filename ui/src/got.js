@@ -66,7 +66,7 @@ function getDiffFromService(curData, prevData) {
 
 
 function episodeChart() {
-  const width = 940;
+  const width = 1100;
   const height = 550;
 
   const tooltip = floatingTooltip('character_tooltip', 240);
@@ -75,11 +75,12 @@ function episodeChart() {
     y: height /2
   };  
 
-  const forceStrength = 0.03;
+  const forceStrength = 0.05;
 
   let svg = null;
   let bubbles = null;
   let nodes = [];
+  let houseCenters = {};
 
   function charge(d) {
     return -Math.pow(d.radius, 2.1) * forceStrength;
@@ -90,8 +91,8 @@ function episodeChart() {
     .force('x', d3.forceX().strength(forceStrength).x(center.x))
     .force('y', d3.forceY().strength(forceStrength).y(center.y))
     .force('charge', d3.forceManyBody().strength(charge))
-    .force('link', d3.forceLink().id(function(d) { return d.index; }))
-    .force('collide', d3.forceCollide(d => d.r + 2).iterations(24))
+    //.force('link', d3.forceLink().id(function(d) { return d.index; }))
+    //.force('collide', d3.forceCollide(d => d.r + 2).iterations(24))
     .on('tick', ticked);
 
   simulation.stop();
@@ -213,6 +214,20 @@ function episodeChart() {
     nodes = createNodes(rawData, lastDataMap);
     lastData = nodes;
 
+    const housesMap = nodes.reduce((acc, charInfo) => {
+      acc[charInfo.house] = true;
+      return acc;
+    }, {});
+    const houses = Object.keys(housesMap);
+    const numHouses = houses.length;
+    const centersGap = (width - 100) / (numHouses + 1);
+    houseCenters = houses.reduce((acc, house, i) => {
+      acc[house] = {
+        x: 100 + centersGap*(i+1),
+        y: height / 2
+      };
+      return acc;
+    }, {});
 
     /*if (svg) {
       d3.selectAll("svg").remove();
@@ -281,6 +296,7 @@ function episodeChart() {
     simulation.nodes(nodes);
 
     groupBubbles();
+    //splitBubbles();
 
     if (diff) {
       diff.remove.forEach((charInfo) => {
@@ -309,6 +325,10 @@ function episodeChart() {
 
   };
 
+  function nodeHousePos(d) {
+    return houseCenters[d.house].x;
+  }
+
   function ticked() {
     bubbles
       .attr('cx', function (d) { return d.x; })
@@ -317,6 +337,11 @@ function episodeChart() {
 
   function groupBubbles() {
     simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
+    simulation.alpha(1).restart();
+  }
+
+  function splitBubbles() {
+    simulation.force('x', d3.forceX().strength(forceStrength).x(nodeHousePos));
     simulation.alpha(1).restart();
   }
 
@@ -362,6 +387,14 @@ function episodeChart() {
     hideCharacter(d);
   }
 
+  chart.toggleDisplay = function (displayName) {
+    if (displayName === 'split-bubbles') {
+      splitBubbles();
+    } else {
+      groupBubbles();
+    }
+  };
+
   return chart;
 }
 
@@ -369,6 +402,15 @@ const gotChart = episodeChart();
 
 function display(data) {
   gotChart('#vis', data);
+}
+
+function setupButtons() {
+  d3.selectAll('.btn')
+    .on('click', function () {
+      var button = d3.select(this);
+      var buttonId = button.attr('id');
+      gotChart.toggleDisplay(buttonId);
+    });
 }
 
 function callApi({endpoint, method, data}) {
@@ -574,6 +616,7 @@ $(document).ready(function () {
     });
 
   loadEpisode(1, 1);
+  setupButtons();
 
   /*fetch(`data/data-s01e01.json`)
     .then(res => res.json())
