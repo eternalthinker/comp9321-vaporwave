@@ -474,7 +474,7 @@ function displayEpisodeTimeline(episodes) {
     const seasonNumber = +episode.seasonNumber;
     let seasonText = '.';
     if (episodeNumber === 1) {
-      seasonText = `S${episode.seasonNumber}`;
+      seasonText = `S${+episode.seasonNumber}`;
     }
     $episodeStep = $(`<div id="episode-step-${episode.EID}" class="episode-step form-steps__item">
         <div class="form-steps__item-content">
@@ -486,7 +486,11 @@ function displayEpisodeTimeline(episodes) {
     );
     if (i === 0) {
       $episodeStep.addClass('form-steps__item--active');
+      $episodeStep.addClass('first-episode-step');
       $episodeStep.find('.form-steps__item-line').remove();
+    }
+    if (episodeNumber === 1) {
+      $episodeStep.find('.form-steps__item-text').addClass('first-episode');
     }
 
     $episodeStep.click(event => {

@@ -132,10 +132,25 @@ body {
 
 .form-steps__item-text {
   font-size: 8px;
-  color: #8191ab;
+  color: #fff;
   font-weight: 500;
   line-height: 8px;
 }
+
+.form-steps__item-text.first-episode {
+  color: #fff;
+  padding: 5px;
+  background: #a2738c;
+  border-radius: 100%;
+  display: block;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.first-episode-step {
+}
+
 .form-steps__item-line {
   display: inline-block;
   height: 3px;
@@ -152,7 +167,10 @@ body {
   color: #ffffff;
 }
 .form-steps__item--active .form-steps__item-text {
-  color: #4f5e77;
+  color: #fff;
+}
+.form-steps__item--active .form-steps__item-text.first-episode {
+  color: #fff;
 }
 .form-steps__item--active .form-steps__item-line {
   background: #005585;
