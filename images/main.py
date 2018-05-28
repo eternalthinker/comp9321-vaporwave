@@ -29,5 +29,14 @@ def get_images():
 	return jsonify(resources)
 
 
+@app.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = "Content-Type, x-access-token, Accept"
+    header['Access-Control-Allow-Methods'] = "GET, POST, DELETE"
+    return response
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=port_number)

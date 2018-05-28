@@ -1,6 +1,7 @@
 /* Globals */
 let lastData = null;
 let isFirstLoad = true;
+let allEpisodes = null;
 
 function getDiff(curData, prevData) {
   /* Convert data list to a map for quick lookup */
@@ -95,7 +96,7 @@ function episodeChart() {
     'baratheon': '#feda95',
     'tyrell': '#88d3d1',
     'nymeros': '#fcba86',
-    'stark': '#6f6f6f',
+    'stark': '#93deff', //#6f6f6f',
     'arryn': '#506c86',
     'greyjoy': '#d8c5ad',
     'other': '#d8d8d8',
@@ -280,10 +281,6 @@ function episodeChart() {
           ;
       });
 
-      /*diff.reuse.forEach((charInfo) => {
-        console.log(`Enlarging ${charInfo.slug}`);
-      });*/
-
       diff.deaths.forEach((charInfo) => {
         d3.select(`#${charInfo.slug}`).transition()
           .duration(2000)
@@ -312,6 +309,24 @@ function episodeChart() {
     simulation.alpha(1).restart();
   }
 
+  function showCharacter(d) {
+    $('.character-name').text(d.name);
+    $('.character-house').text(d.house || '');
+    $('.character-image').attr('src', d.image || '');
+    $('.character-quote').html(d.quotes ? d.quotes[0] : '');
+    if (d.isAlive) {
+      $('.character-death').hide();
+    } else {
+      $('.character-death').text(d.means_of_death);
+      $('.character-death').show();
+    }
+    $('.character').show();
+  }
+
+  function hideCharacter(d) {
+    $('.character').hide(); 
+  }
+
   function showDetail(d) {
     d3.select(this).attr('stroke', 'black');
 
@@ -325,6 +340,7 @@ function episodeChart() {
                   d.actor +
                   '</span>';
     tooltip.showTooltip(content, d3.event);
+    showCharacter(d);
   }
 
   function hideDetail(d) {
@@ -332,6 +348,7 @@ function episodeChart() {
       .attr('stroke', d3.rgb(fillColor(d.house)).darker());
 
     tooltip.hideTooltip();
+    hideCharacter(d);
   }
 
   return chart;
@@ -359,7 +376,7 @@ function callApi({endpoint, method, data}) {
     .then(json => json);
 }
 
-function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
+function mashUp(episodeCharacters, characterQuotes, charactersIaF, characterImages) {
   const episodeCharactersMap = episodeCharacters.reduce((acc, charInfo) => {
     acc[charInfo.CID] = charInfo;
     return acc;
@@ -384,7 +401,8 @@ function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
     return {
       ...charInfo,
       ...episodeCharactersMap[slug],
-      quotes: characterQuotes[slug]
+      quotes: characterQuotesMap[slug],
+      image: characterImages[slug]
     }
   });
 
@@ -418,9 +436,20 @@ function loadEpisode(seasonNumber, episodeNumber) {
         data: characterList
       })
       .then(charactersIaF => {
-        const characters = mashUp(episodeCharacters, characterQuotes, charactersIaF);
-        console.log(characters);
-        display(characters);
+        callApi({
+          endpoint: `http://localhost:1337/images`,
+          method: 'POST',
+          data: characterList
+        }).then(characterImages => {
+          const characters = mashUp(
+            episodeCharacters, 
+            characterQuotes, 
+            charactersIaF, 
+            characterImages
+          );
+          console.log(characters);
+          display(characters);
+        }); // Img service 
       }); // IaF - characters
     }); // IMDB - quotes
   }); // IMDB - episode chars
@@ -447,6 +476,17 @@ function showTimelineProgress(seasonNumber, episodeNumber) {
   });
 }
 
+function showEpisodeInfo(episode) {
+  //$('.episode-title').text(episode.title);
+  $(".episode-title").fadeOut(function() {
+    $(this).text(episode.title);
+  }).fadeIn();
+  $('.episode-order').text(`Season ${+episode.seasonNumber}, Episode ${+episode.episodeNumber}`);
+  $('.episode-duration').text(`${episode.duration} minutes`);
+  $('.episode-rating').text(episode.averageRating);
+  $('.episode-votes').text(episode.numVotes);
+}
+
 function displayEpisodeTimeline(episodes) {
   episodes = episodes.sort((e1, e2) => {
     if (e1.seasonNumber === e2.seasonNumber) {
@@ -462,9 +502,16 @@ function displayEpisodeTimeline(episodes) {
     const seasonNumber = +episode.seasonNumber;
     let seasonText = '.';
     if (episodeNumber === 1) {
-      seasonText = `S${episode.seasonNumber}`;
+      seasonText = `S${+episode.seasonNumber}`;
     }
-    $episodeStep = $(`<div id="episode-step-${episode.EID}" class="episode-step form-steps__item">
+    $episodeStep = $(`
+      <div id="episode-step-${episode.EID}" 
+        class="episode-step form-steps__item"
+        data-toggle="tooltip" 
+        data-placement="top" 
+        data-html="true"
+        title="Season ${seasonNumber}, Episode ${episodeNumber}<br/><b>${episode.title}</b>"
+      >
         <div class="form-steps__item-content">
           <span class="form-steps__item-icon">${episodeNumber}</span>
           <span class="form-steps__item-line"></span>
@@ -474,12 +521,17 @@ function displayEpisodeTimeline(episodes) {
     );
     if (i === 0) {
       $episodeStep.addClass('form-steps__item--active');
+      $episodeStep.addClass('first-episode-step');
       $episodeStep.find('.form-steps__item-line').remove();
+    }
+    if (episodeNumber === 1) {
+      $episodeStep.find('.form-steps__item-text').addClass('first-episode');
     }
 
     $episodeStep.click(event => {
       loadEpisode(seasonNumber, episodeNumber);
       showTimelineProgress(seasonNumber, episodeNumber);
+      showEpisodeInfo(episode);
     });
 
     $episodeTimeline.append($episodeStep)
@@ -501,7 +553,14 @@ $(document).ready(function () {
 
   fetch(`http://localhost:5000/episodes`)
     .then(res => res.json())
-    .then(json => displayEpisodeTimeline(json));
+    .then(json => {
+      allEpisodes = json;
+      displayEpisodeTimeline(json);
+      showEpisodeInfo(json[0]);
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+    });
 
   loadEpisode(1, 1);
 
