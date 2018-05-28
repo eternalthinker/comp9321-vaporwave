@@ -349,7 +349,7 @@ function episodeChart() {
     $('.character-name').text(d.name);
     $('.character-house').text(d.house || '');
     $('.character-image').attr('src', d.image || '');
-    $('.character-quote').html(d.quotes ? d.quotes[0] : '');
+    $('.character-quote').html(d.quotes ? d.quotes[Math.floor(Math.random() * d.quotes.length)] : '');
     if (d.isAlive) {
       $('.character-death').hide();
     } else {
