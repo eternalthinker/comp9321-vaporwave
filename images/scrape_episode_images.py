@@ -1,75 +1,67 @@
 from bs4 import BeautifulSoup
 import requests, re, lxml
 from pathlib import Path
-from classes import *
+import time, sys
+from random import randint
+import urllib
 
-def scrape_images(episode_id):
+cast_url = "https://www.hbo.com/game-of-thrones/cast-and-crew"
 
-	if episode_id == "test":
-		episode_id = "tt2085239"
-		html_file = open("test_characters.html", 'r')		# This is tt5655178
+def scrape_images():
+
+	# Avoid re-scraping 
+	my_file = Path("./game-of-thrones-cast-and-crew.html")
+	if my_file.is_file():
+		html_file = open("game-of-thrones-cast-and-crew.html", 'r')
 		soup = BeautifulSoup(html_file, "lxml")
 		html_file.close()
-	else: 
-		url_string = "https://www.imdb.com/title/" + episode_id + "/fullcredits?ref_=tt_cl_sm#cast"
-		r  = requests.get(url_string)
+	else:
+		r  = requests.get(cast_url)
 		data = r.text
+		html_file = open("game-of-thrones-cast-and-crew.html", "w")
+		html_file.write(data)
 		soup = BeautifulSoup(data, "lxml")
+		html_file.close()
 
-	# Get episode info
-	title_link = soup.find("a", class_="subnav_heading")
-	episode_title = title_link.contents[0].strip()
-	#print("Episode title: " + episode_title)
-	e = Episode(episode_title, episode_id)
-	# all_episodes.append(e)
 
-	characters = []
+	# Iterate through character listicle items and scrape attributes
+	i=0
+	for listicle_item in soup.find_all("div", class_="modules/Cast--castMember"):
 
-	# Characters are contained in table rows within cast_list
-	for table in soup.find_all("table", class_="cast_list"):
-		for char_row in table.find_all("tr"):
+		print(str(i))
+		i=i+1
 
-			# Get character name
-			char_name = ""
-			for name_row in char_row.find_all("td", class_="character"):
+		img = listicle_item.find("img", src=True)
+		link = "https://www.hbo.com" + img['src']
 
-				# Check if character name is enclosed in a link or not
-				char_link = name_row.find("a")
-				if char_link:
-					char_name = char_link.contents[0]
-				else:
-					char_name = name_row.contents[0]
-				char_name = re.sub(r'\(.*\)', '', char_name).strip() #remove bracketed info about character
-				#print("Character: " + char_name)
+		print(link)
 
-			actor_name = None
-			if char_row.find("span", class_="itemprop"):
-				actor_name = char_row.find("span", class_="itemprop").contents[0].strip()
-				#print("Played by: " + actor_name)
+		r  = requests.get(link)
+		time.sleep(randint(1, 2))
 
-			if char_name != "":
-				characters.append((char_name, actor_name))
+		# # The main character name is in a div with class "headline"
+		# # the first and only item ([0])
+		# name = listicle_item.find("div", class_="headline").contents[0].strip()
 
-			# Either add episode info to existing character object, or create new character with episode info
-			character = get_character_by_name(char_name)
-			if character:
-				character.add_episode(episode_id)
-				character.set_played_by(actor_name)
-			else:
-				if char_name != "":
-					character = Character(char_name)
-					character.add_episode(episode_id)
-					character.set_played_by(actor_name)
-					all_characters.append(character)
+		# # All other character details are in paragraphs
+		# details = listicle_item.find_all("p")
+		
+		# # Role
+		# role = details[0].contents[1].strip()
 
-			# Add character to the episode's character list (added as a slug)
-			#e = get_episode_by_id(episode_id)
-			e.add_character(char_name)
+		# # Season and episode of death
+		# time_of_death = str(details[1].contents)
+		# match = re.search(r'Season ([0-9]*)', time_of_death)
+		# season_of_death = int(match.group(1))
+		# match = re.search(r'Episode ([0-9]*)', time_of_death)
+		# episode_of_death = int(match.group(1))
 
-	return characters
+		# # Means of death
+		# means_of_death = details[2].contents[1].strip()
 
-if __name__ == "__main__":
-	print(scrape_characters('tt1480055'))
+
+# if __name__ == "__main__":
+# 	print(scrape_characters('tt1480055'))
 
 
 
