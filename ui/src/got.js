@@ -360,7 +360,7 @@ function callApi({endpoint, method, data}) {
     .then(json => json);
 }
 
-function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
+function mashUp(episodeCharacters, characterQuotes, charactersIaF, characterImages) {
   const episodeCharactersMap = episodeCharacters.reduce((acc, charInfo) => {
     acc[charInfo.CID] = charInfo;
     return acc;
@@ -385,7 +385,8 @@ function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
     return {
       ...charInfo,
       ...episodeCharactersMap[slug],
-      quotes: characterQuotes[slug]
+      quotes: characterQuotes[slug],
+      image: characterImages[slug]
     }
   });
 
@@ -419,9 +420,20 @@ function loadEpisode(seasonNumber, episodeNumber) {
         data: characterList
       })
       .then(charactersIaF => {
-        const characters = mashUp(episodeCharacters, characterQuotes, charactersIaF);
-        console.log(characters);
-        display(characters);
+        callApi({
+          endpoint: `http://localhost:1337/images`,
+          method: 'POST',
+          data: characterList
+        }).then(characterImages => {
+          const characters = mashUp(
+            episodeCharacters, 
+            characterQuotes, 
+            charactersIaF, 
+            characterImages
+          );
+          console.log(characters);
+          display(characters);
+        }); // Img service 
       }); // IaF - characters
     }); // IMDB - quotes
   }); // IMDB - episode chars
