@@ -4,9 +4,9 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "Very very very secret key"
 
-port_number = 8000
+port_number = 6000
 
-@app.route("/", methods=['POST'])
+@app.route("/diff", methods=['POST'])
 def get_analytics():
     curr_data = request.json['curr_data']
     prev_data  =  request.json['prev_data']
@@ -20,23 +20,25 @@ def get_analytics():
     for item in curr_data:
         curr_data_dict[item['slug']] = item
 
-
     for item in prev_data:
         prev_data_dict[item['slug']] = item
 
-    for i in curr_data_dict:
-        if i in prev_data_dict:
-            curr_alive = curr_data_dict[i]['is_alive']
-            pre_Alive =  prev_data_dict[i]['is_alive']
-            if pre_Alive == 'true' and not curr_alive == 'true':
+    for i in curr_data:
+        slug = i['slug']
+        if slug in prev_data_dict:
+            curr_alive = i['isAlive']
+            pre_Alive =  prev_data_dict[slug]['isAlive']
+            if pre_Alive == 1 and not curr_alive == 1:
                 deaths.append(i)
-            elif not pre_Alive == 'true' and curr_alive == 'true':
+            elif not pre_Alive == 1 and curr_alive == 1:
                 reverseDeaths.append(i)
             reuse.append(i)
         else:
             add.append(i)
-    for i in prev_data_dict:
-        if i not in curr_data_dict:
+
+    for i in prev_data:
+        slug = i['slug']
+        if slug not in curr_data_dict:
             remove.append(i)
 
     return jsonify({ 'add': add, 'reuse': reuse, 'deaths':deaths, 'reverseDeaths': reverseDeaths, 'remove':remove})
