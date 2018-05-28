@@ -1,5 +1,5 @@
-from flask import Flask, redirect, render_template, request, url_for, jsonify, Response, make_response
-from flask_restful import reqparse
+from flask import Flask, request, jsonify
+# from flask_restful import reqparse
 from pathlib import Path
 
 app = Flask(__name__)
@@ -18,7 +18,6 @@ def get_images():
 
 	for slug in content:
 		path_string = "./static/" + slug + ".jpeg"
-		print(path_string)
 
 		file_name = Path(path_string)
 
