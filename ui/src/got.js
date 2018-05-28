@@ -17,13 +17,18 @@ function getDiff(curData, prevData) {
   let remove = [];
   let reuse = [];
   let deaths = [];
+  let reverseDeaths = [];
   let add = [];
 
   curData.forEach((charInfo, i) => {
     const slug = charInfo.slug;
     if (slug in prevDataMap) {
-      if (!Boolean(charInfo.isAlive)) {
+      const isAlive = Boolean(charInfo.isAlive);
+      const prevAlive = Boolean(prevDataMap[slug].isAlive);
+      if (prevAlive && !isAlive) {
         deaths.push(charInfo);
+      } else if (!prevAlive && isAlive) {
+        reverseDeaths.push(charInfo);
       }
       reuse.push(charInfo);
     } else {
@@ -42,7 +47,8 @@ function getDiff(curData, prevData) {
     add,
     remove,
     reuse,
-    deaths
+    deaths,
+    reverseDeaths
   };
 }
 
@@ -57,7 +63,7 @@ function episodeChart() {
     y: height /2
   };  
 
-  const forceStrength = 0.06;
+  const forceStrength = 0.03;
 
   let svg = null;
   let bubbles = null;
@@ -73,7 +79,7 @@ function episodeChart() {
     .force('y', d3.forceY().strength(forceStrength).y(center.y))
     .force('charge', d3.forceManyBody().strength(charge))
     .force('link', d3.forceLink().id(function(d) { return d.index; }))
-    .force('collide', d3.forceCollide(d => d.r + 10).iterations(24))
+    .force('collide', d3.forceCollide(d => d.r + 2).iterations(24))
     .on('tick', ticked);
 
   simulation.stop();
@@ -137,19 +143,17 @@ function episodeChart() {
     return house;
   }
 
-  function createNodes(rawData) {
+  function createNodes(rawData, prevDataMap) {
     const maxEpisodes = 45; //d3.max(rawData, (d) => +d.episodeCount);
-    console.log(d3.max(rawData, (d) => +d.episodeCount))
-
     const radiusScale = d3.scalePow()
       .exponent(0.5)
       .range([5, 40])
       .domain([0, maxEpisodes]);
 
     const myNodes = rawData.map((d) => {
-      return {
+      let node = {
         ...d,
-        slug: d.CID,
+        slug: d.slug,
         name: d.name,
         actor: d.actor,
         house: getHouse(d.allegiances),
@@ -157,9 +161,20 @@ function episodeChart() {
         id: d.CID,
         isAlive: Boolean(d.isAlive),
         radius: radiusScale(+d.episodeCount),
-        x: Math.random() * 900,
-        y: Math.random() * 800
+        r: radiusScale(+d.episodeCount)
       };
+
+      const slug = d.slug;
+      if (prevDataMap && (slug in prevDataMap)) {
+        const prevNode = prevDataMap[slug];
+        node.x = prevNode.x;
+        node.y = prevNode.y;
+      } else {
+        node.x = Math.random() * width;
+        node.y = Math.random() * height;
+      }
+
+      return node;
     });
 
     myNodes.sort(function (a, b) { return b.value - a.value; });
@@ -173,27 +188,18 @@ function episodeChart() {
     if (lastData) {
       isFirstLoad = false;
       diff = getDiff(rawData, lastData);
-
-      diff.remove.forEach((charInfo) => {
-        // console.log(`Removing ${charInfo.slug}`);
-        d3.select(`#${charInfo.slug}`).remove();
-      });
-
-      /*diff.reuse.forEach((charInfo) => {
-        console.log(`Enlarging ${charInfo.slug}`);
-      });*/
-
-      diff.deaths.forEach((charInfo) => {
-        console.log(`Fade to death ${charInfo.slug}`);
-      });
-
-      nodes = createNodes(rawData);
-    } else {
-      nodes = createNodes(rawData);
     }
 
-    lastData = rawData;
-
+    // lastData = rawData;
+    let lastDataMap = null;
+    if (lastData) {
+      lastDataMap = lastData.reduce((acc, charInfo) => {
+        acc[charInfo.slug] = charInfo;
+        return acc;
+      }, {});
+    }
+    nodes = createNodes(rawData, lastDataMap);
+    lastData = nodes;
 
 
     /*if (svg) {
@@ -205,6 +211,7 @@ function episodeChart() {
         .attr('width', width)
         .attr('height', height);
     }
+
     bubbles = svg.selectAll('.bubble')
       .data(nodes, (d) => d.CID);
 
@@ -233,36 +240,65 @@ function episodeChart() {
       d.fy = null;
     } 
 
-    const bubblesE = bubbles.enter().append('circle')
-      .classed('bubble', true)
-      .attr('id', d => d.slug)
-      //.attr('r', 0)
-      .attr('fill', function (d) { return fillColor(d.house); })
-      .attr('stroke', function (d) { return d3.rgb(fillColor(d.house)).darker(); })
-      .attr('stroke-width', 2)
-      .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
-      .on('mouseover', showDetail)
-      .on('mouseout', hideDetail)
-      .attr("r", function(d){  return d.r })
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended))
+    const bubblesE = bubbles.enter()
+      .append('circle')
+        .classed('bubble', true)
+        .attr('id', d => d.slug)
+        .attr('r', 0)
+        .attr('fill', function (d) { return fillColor(d.house); })
+        .attr('stroke', function (d) { return d3.rgb(fillColor(d.house)).darker(); })
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
+        .on('mouseover', showDetail)
+        .on('mouseout', hideDetail)
+        //.attr("r", function(d){  return d.r })
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
       ;
 
     bubbles = bubbles.merge(bubblesE);
 
     bubbles.transition()
       .duration(2000)
-      .attr('r', function (d) { return d.radius; });
+      .attr('transform', 'translate(0)')
+      .attr('r', function (d) { return d.radius; })
+      ;
 
     simulation.nodes(nodes);
 
     groupBubbles();
-    /*d3.select('#jon_snow').transition()
-      .duration(5000)
-      .attr('transform', 'translate(0)')
-      .attr('r', 200);*/
+
+    if (diff) {
+      diff.remove.forEach((charInfo) => {
+        d3.select(`#${charInfo.slug}`).transition()
+          .duration(2000)
+          .attr('transform', 'translate(0)')
+          .attr('r', 0)
+          .remove()
+          ;
+      });
+
+      /*diff.reuse.forEach((charInfo) => {
+        console.log(`Enlarging ${charInfo.slug}`);
+      });*/
+
+      diff.deaths.forEach((charInfo) => {
+        d3.select(`#${charInfo.slug}`).transition()
+          .duration(2000)
+          .attr('stroke-dasharray', '5')
+          ;
+      });
+
+      diff.reverseDeaths.forEach((charInfo) => {
+        d3.select(`#${charInfo.slug}`).transition()
+          .duration(2000)
+          .attr('stroke-dasharray', '')
+          ;
+      });
+    }
+
   };
 
   function ticked() {
