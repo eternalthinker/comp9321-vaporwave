@@ -39,29 +39,6 @@ def scrape_images():
 		r  = requests.get(link)
 		time.sleep(randint(1, 2))
 
-		# # The main character name is in a div with class "headline"
-		# # the first and only item ([0])
-		# name = listicle_item.find("div", class_="headline").contents[0].strip()
-
-		# # All other character details are in paragraphs
-		# details = listicle_item.find_all("p")
-		
-		# # Role
-		# role = details[0].contents[1].strip()
-
-		# # Season and episode of death
-		# time_of_death = str(details[1].contents)
-		# match = re.search(r'Season ([0-9]*)', time_of_death)
-		# season_of_death = int(match.group(1))
-		# match = re.search(r'Episode ([0-9]*)', time_of_death)
-		# episode_of_death = int(match.group(1))
-
-		# # Means of death
-		# means_of_death = details[2].contents[1].strip()
-
-
-# if __name__ == "__main__":
-# 	print(scrape_characters('tt1480055'))
 
 
 
