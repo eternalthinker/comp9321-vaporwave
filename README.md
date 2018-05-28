@@ -1,4 +1,6 @@
-# Game of Thrones Data Visualisation
+# Game of Thrones Data Visualisation: "The Timeline of Ice and Fire"
+
+*A narrative of character changes across episodes in Game of Thrones TV series*
 
 ### Vaporwave Group
 * Rahul Anand 
