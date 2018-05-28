@@ -34,8 +34,8 @@ def test(season, episode):
             (select c1.CID, count(*) as episodeCount 
              from episodes as e1, characters as c1, episode_characters as ec1
              where 
-                cast(e1.seasonNumber as integer) <= {} and
-                cast(e1.episodeNumber as integer) <= {} and
+                ((cast(e1.seasonNumber as integer) < {}) or 
+                 (cast(e1.seasonNumber as integer) == {} and cast(e1.episodeNumber as integer) <= {})) and 
                 e1.EID == ec1.EID and
                 c1.CID == ec1.CID
                 group by c1.CID
@@ -47,7 +47,7 @@ def test(season, episode):
             c.CID == ec.CID and
             c.CID == eCounts.CID
         ;
-        '''.format(season, episode, season, episode, season, episode)
+        '''.format(season, episode, season, season, episode, season, episode)
     )
     characters = []
     for character in cs:

@@ -139,6 +139,7 @@ function episodeChart() {
 
   function createNodes(rawData) {
     const maxEpisodes = 45; //d3.max(rawData, (d) => +d.episodeCount);
+    console.log(d3.max(rawData, (d) => +d.episodeCount))
 
     const radiusScale = d3.scalePow()
       .exponent(0.5)
