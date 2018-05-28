@@ -488,7 +488,13 @@ function displayEpisodeTimeline(episodes) {
     if (episodeNumber === 1) {
       seasonText = `S${+episode.seasonNumber}`;
     }
-    $episodeStep = $(`<div id="episode-step-${episode.EID}" class="episode-step form-steps__item">
+    $episodeStep = $(`
+      <div id="episode-step-${episode.EID}" 
+        class="episode-step form-steps__item"
+        data-toggle="tooltip" 
+        data-placement="top" 
+        title="Season ${seasonNumber}, Episode ${episodeNumber}"
+      >
         <div class="form-steps__item-content">
           <span class="form-steps__item-icon">${episodeNumber}</span>
           <span class="form-steps__item-line"></span>
@@ -534,6 +540,9 @@ $(document).ready(function () {
       allEpisodes = json;
       displayEpisodeTimeline(json);
       showEpisodeInfo(json[0]);
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
     });
 
   loadEpisode(1, 1);
