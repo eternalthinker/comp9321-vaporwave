@@ -19,20 +19,9 @@ function getDiff(curData, prevData) {
   let deaths = [];
   let add = [];
 
-  console.log(Object.keys(prevDataMap));
-  console.log(Object.keys(curDataMap));
-
   curData.forEach((charInfo, i) => {
     const slug = charInfo.slug;
-    if (slug === 'petyr_baelish') {
-      if (!Boolean(charInfo.isAlive)) {
-        console.log("DED");
-      }
-    }
     if (slug in prevDataMap) {
-      if (slug === 'petyr_baelish') {
-          console.log("HE HERE");
-      }
       if (!Boolean(charInfo.isAlive)) {
         deaths.push(charInfo);
       }
@@ -94,22 +83,22 @@ function episodeChart() {
     .range(['#ffffff', '#000000']);
 
   const houseColorMappings = {
-    'targaryen': '#fc94aa',
-    'lannister': '#c26271',
+    'targaryen': '#f73859',
+    'lannister': '#ffc300',
     'tully': '#add3fb',
     'baratheon': '#feda95',
     'tyrell': '#88d3d1',
     'nymeros': '#fcba86',
-    'stark': '#d8d8d8',
+    'stark': '#6f6f6f',
     'arryn': '#506c86',
     'greyjoy': '#d8c5ad',
-    'other': '#6f6f6f',
+    'other': '#d8d8d8',
 
-    'clegane': '#6b0848',
+    'clegane': '#f8b195',
     'reed': '#a40a3c',
     'cassel': '#ec610a',
-    'mormont': '#ffc300',
-    'baelish': '#f73859',
+    'mormont': '#c26271',
+    'baelish': '#fc94aa',
     'selmy': '#404b69',
     'payne': '#00818a',
     'tarly': '#6db193',
