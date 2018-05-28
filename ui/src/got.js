@@ -1,7 +1,7 @@
 
 function episodeChart() {
   const width = 940;
-  const height = 600;
+  const height = 550;
 
   const tooltip = floatingTooltip('character_tooltip', 240);
   const center = {
@@ -9,7 +9,7 @@ function episodeChart() {
     y: height /2
   };  
 
-  const forceStrength = 0.03;
+  const forceStrength = 0.06;
 
   let svg = null;
   let bubbles = null;
@@ -24,6 +24,8 @@ function episodeChart() {
     .force('x', d3.forceX().strength(forceStrength).x(center.x))
     .force('y', d3.forceY().strength(forceStrength).y(center.y))
     .force('charge', d3.forceManyBody().strength(charge))
+    .force('link', d3.forceLink().id(function(d) { return d.index; }))
+    .force('collide', d3.forceCollide(d => d.r + 10).iterations(24))
     .on('tick', ticked);
 
   simulation.stop();
@@ -32,27 +34,80 @@ function episodeChart() {
     .domain(['alive', 'dead'])
     .range(['#ffffff', '#000000']);
 
-  const fillColor = d3.scaleOrdinal()
-    .domain(['stark', 'targaryen', 'lannister', 'dothraki'])
-    .range(['#d84b2a', '#beccae', '#7aa25c', '#cccccc']);
+  const houseColorMappings = {
+    'targaryen': '#fc94aa',
+    'lannister': '#c26271',
+    'tully': '#add3fb',
+    'baratheon': '#feda95',
+    'tyrell': '#88d3d1',
+    'nymeros': '#fcba86',
+    'stark': '#d8d8d8',
+    'arryn': '#506c86',
+    'greyjoy': '#d8c5ad',
+    'other': '#6f6f6f',
+
+    'clegane': '#6b0848',
+    'reed': '#a40a3c',
+    'cassel': '#ec610a',
+    'mormont': '#ffc300',
+    'baelish': '#f73859',
+    'selmy': '#404b69',
+    'payne': '#00818a',
+    'tarly': '#6db193',
+    'stokeworth': '#e7759a',
+    'bolton': '#ba78cd',
+    'frey': '#409d9b'
+  };
+
+  /*let houseDomains = Object.keys(houseColorMappings);
+  let houseColorRange = [];
+  for (let key of houseDomains) {
+    houseColorRange.push(houseColorMappings[key]);
+  }*/
+
+  /*const fillColor = d3.scaleOrdinal()
+    .domain(houseDomains)
+    .range([...houseColorRange]);*/
+    /*, 
+      '#6b0848', '#a40a3c', '#ec610a', '#ffc300', 
+      '#f73859', '#404b69', '#00818a', '#658525', '#e7759a']);*/
+
+  const fillColor = (house) => {
+    house = house.toLowerCase();
+    if (!houseColorMappings.hasOwnProperty(house)) {
+      house = 'other';
+    } 
+    return houseColorMappings[house];
+  };
+
+  function getHouse(allegiances) {
+    if (allegiances == 'NULL') {
+      return 'Other';
+    }
+    const houseTitle = allegiances.split(',')[0];
+    const house = houseTitle.split(' ')[1];
+    return house;
+  }
 
   function createNodes(rawData) {
-    const maxEpisodes = d3.max(rawData, (d) => +d.num_episodes);
+    const maxEpisodes = d3.max(rawData, (d) => +d.episodeCount);
 
     const radiusScale = d3.scalePow()
       .exponent(0.5)
-      .range([2, 50])
+      .range([2, 30])
       .domain([0, maxEpisodes]);
 
     const myNodes = rawData.map((d) => {
       return {
-        slug: d.slug,
+        ...d,
+        slug: d.CID,
         name: d.name,
-        house: d.house,
-        value: d.num_episodes,
-        id: d.slug,
-        isAlive: d.is_alive,
-        radius: radiusScale(+d.num_episodes),
+        actor: d.actor,
+        house: getHouse(d.allegiances),
+        value: d.episodeCount,
+        id: d.CID,
+        isAlive: Boolean(d.isAlive),
+        radius: radiusScale(+d.episodeCount),
         x: Math.random() * 900,
         y: Math.random() * 800
       };
@@ -63,6 +118,7 @@ function episodeChart() {
     return myNodes;
   }
 
+  // Create chart
   const chart = function chart(selector, rawData) {
     nodes = createNodes(rawData);
 
@@ -75,7 +131,7 @@ function episodeChart() {
       .attr('height', height);
 
     bubbles = svg.selectAll('.bubble')
-      .data(nodes, (d) => d.slug);
+      .data(nodes, (d) => d.CID);
 
     function aliveStatus(isAlive) {
       if (isAlive) {
@@ -85,15 +141,39 @@ function episodeChart() {
       }
     }
 
+    function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+    
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    } 
+
     const bubblesE = bubbles.enter().append('circle')
       .classed('bubble', true)
-      .attr('r', 0)
+      .attr('id', d => d.slug)
+      //.attr('r', 0)
       .attr('fill', function (d) { return fillColor(d.house); })
       .attr('stroke', function (d) { return d3.rgb(fillColor(d.house)).darker(); })
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', (d) => d.isAlive? "": "5")
       .on('mouseover', showDetail)
-      .on('mouseout', hideDetail);
+      .on('mouseout', hideDetail)
+      .attr("r", function(d){  return d.r })
+      .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended))
+      ;
 
     bubbles = bubbles.merge(bubblesE);
 
@@ -104,6 +184,10 @@ function episodeChart() {
     simulation.nodes(nodes);
 
     groupBubbles();
+    d3.select('#jon_snow').transition()
+      .duration(5000)
+      .attr('transform', 'translate(0)')
+      .attr('r', 200);
   };
 
   function ticked() {
@@ -126,8 +210,8 @@ function episodeChart() {
                   '<span class="name">House: </span><span class="value">' +
                   d.house +
                   '</span><br/>' +
-                  '<span class="name">Value: </span><span class="value">' +
-                  d.value +
+                  '<span class="name">Actor: </span><span class="value">' +
+                  d.actor +
                   '</span>';
     tooltip.showTooltip(content, d3.event);
   }
@@ -148,6 +232,151 @@ function display(data) {
   gotChart('#vis', data);
 }
 
+function callApi({endpoint, method, data}) {
+  let params = {};
+  if (method === 'POST') {
+    params = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+  }
+  return fetch(endpoint, params)
+    .then(res => res.json())
+    .then(json => json);
+}
+
+function mashUp(episodeCharacters, characterQuotes, charactersIaF) {
+  const episodeCharactersMap = episodeCharacters.reduce((acc, charInfo) => {
+    acc[charInfo.CID] = charInfo;
+    return acc;
+  }, {});
+  
+  const characterQuotesMap = characterQuotes.reduce((acc, quote) => {
+    const slug = quote.CID;
+    if (!acc.hasOwnProperty(slug)) {
+      acc[slug] = [];
+    }
+    acc[slug].push(quote.quote_text);
+    return acc;
+  }, {});
+
+  const charactersIaFMap = charactersIaF.reduce((acc, charInfo) => {
+    acc[charInfo.slug] = charInfo;
+    return acc;
+  }, {});
+
+  const characters = charactersIaF.map(charInfo => {
+    const slug = charInfo.slug;
+    return {
+      ...charInfo,
+      ...episodeCharactersMap[slug],
+      quotes: characterQuotes[slug]
+    }
+  });
+
+  /*const characters = episodeCharacters.map(charInfo => {
+    const slug = charInfo.CID;
+    return {
+      ...charInfo,
+      ...charactersIaFMap[slug],
+      quotes: characterQuotesMap[slug]
+    }
+  });*/
+
+  return characters;
+}
+
+function loadEpisode(seasonNumber, episodeNumber) {
+  callApi({
+    endpoint: `http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/characters`,
+    method: 'GET'
+  })
+  .then(episodeCharacters => {
+    callApi({
+      endpoint: `http://localhost:5000/season/${seasonNumber}/episode/${episodeNumber}/quotes`,
+      method: 'GET'
+    })
+    .then(characterQuotes => {
+      const characterList = episodeCharacters.map(charInfo => charInfo.CID);
+      callApi({
+        endpoint: `http://localhost:7000/characters`,
+        method: 'POST',
+        data: characterList
+      })
+      .then(charactersIaF => {
+        const characters = mashUp(episodeCharacters, characterQuotes, charactersIaF);
+        console.log(characters);
+        display(characters);
+      }); // IaF - characters
+    }); // IMDB - quotes
+  }); // IMDB - episode chars
+}
+
+function getEID(seasonNumber, episodeNumber) {
+  return `${("0" + seasonNumber).slice(-2)}${("0" + episodeNumber).slice(-2)}`;
+}
+
+function showTimelineProgress(seasonNumber, episodeNumber) {
+  $('.episode-step').removeClass('form-steps__item--active');
+  Array.from(Array(seasonNumber-1).keys()).forEach((s) => {
+    Array.from(Array(10).keys()).forEach((e) => {
+      const eid = getEID(s+1, e+1);
+      const stepEl = $(`#episode-step-${eid}`)
+      if (stepEl) {
+        stepEl.addClass('form-steps__item--active');
+      }
+    });
+  });
+  Array.from(Array(episodeNumber).keys()).forEach((e) => {
+    const eid = getEID(seasonNumber, e+1);
+    $(`#episode-step-${eid}`).addClass('form-steps__item--active');
+  });
+}
+
+function displayEpisodeTimeline(episodes) {
+  episodes = episodes.sort((e1, e2) => {
+    if (e1.seasonNumber === e2.seasonNumber) {
+      return +e1.episodeNumber - +e2.episodeNumber;
+    }
+    return +e1.seasonNumber - +e2.seasonNumber;
+  });
+
+  $episodeTimeline = $("#episode-timeline");
+
+  episodes.forEach((episode, i) => {
+    const episodeNumber = +episode.episodeNumber;
+    const seasonNumber = +episode.seasonNumber;
+    let seasonText = '.';
+    if (episodeNumber === 1) {
+      seasonText = `S${episode.seasonNumber}`;
+    }
+    $episodeStep = $(`<div id="episode-step-${episode.EID}" class="episode-step form-steps__item">
+        <div class="form-steps__item-content">
+          <span class="form-steps__item-icon">${episodeNumber}</span>
+          <span class="form-steps__item-line"></span>
+          <span class="form-steps__item-text">${seasonText}</span>
+        </div>
+      </div>`
+    );
+    if (i === 0) {
+      $episodeStep.addClass('form-steps__item--active');
+      $episodeStep.find('.form-steps__item-line').remove();
+    }
+
+    $episodeStep.click(event => {
+      loadEpisode(seasonNumber, episodeNumber);
+      showTimelineProgress(seasonNumber, episodeNumber);
+    });
+
+    $episodeTimeline.append($episodeStep)
+  });
+}
+
+
+
 $(document).ready(function () {
 
   $(".button").click(function (event) {
@@ -159,8 +388,14 @@ $(document).ready(function () {
       .then(json => display(json));
   });
 
-  fetch(`data/data-s01e01.json`)
+  fetch(`http://localhost:5000/episodes`)
     .then(res => res.json())
-    .then(json => display(json));
+    .then(json => displayEpisodeTimeline(json));
+
+  loadEpisode(1, 1);
+
+  /*fetch(`data/data-s01e01.json`)
+    .then(res => res.json())
+    .then(json => display(json));*/
 
 });
