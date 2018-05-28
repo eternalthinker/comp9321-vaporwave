@@ -1,3 +1,62 @@
+/* Globals */
+let lastData = null;
+let isFirstLoad = true;
+
+function getDiff(curData, prevData) {
+  /* Convert data list to a map for quick lookup */
+  const prevDataMap = prevData.reduce((acc, charInfo) => {
+    acc[charInfo.slug] = charInfo;
+    return acc;
+  }, {});
+
+  const curDataMap = curData.reduce((acc, charInfo) => {
+    acc[charInfo.slug] = charInfo;
+    return acc;
+  }, {});
+
+  let remove = [];
+  let reuse = [];
+  let deaths = [];
+  let add = [];
+
+  console.log(Object.keys(prevDataMap));
+  console.log(Object.keys(curDataMap));
+
+  curData.forEach((charInfo, i) => {
+    const slug = charInfo.slug;
+    if (slug === 'petyr_baelish') {
+      if (!Boolean(charInfo.isAlive)) {
+        console.log("DED");
+      }
+    }
+    if (slug in prevDataMap) {
+      if (slug === 'petyr_baelish') {
+          console.log("HE HERE");
+      }
+      if (!Boolean(charInfo.isAlive)) {
+        deaths.push(charInfo);
+      }
+      reuse.push(charInfo);
+    } else {
+      add.push(charInfo);
+    }
+  });
+
+  prevData.forEach((charInfo, i) => {
+    const slug = charInfo.slug;
+    if (!(slug in curDataMap)) {
+      remove.push(charInfo);
+    }
+  });
+
+  return {
+    add,
+    remove,
+    reuse,
+    deaths
+  };
+}
+
 
 function episodeChart() {
   const width = 940;
@@ -90,11 +149,11 @@ function episodeChart() {
   }
 
   function createNodes(rawData) {
-    const maxEpisodes = d3.max(rawData, (d) => +d.episodeCount);
+    const maxEpisodes = 45; //d3.max(rawData, (d) => +d.episodeCount);
 
     const radiusScale = d3.scalePow()
       .exponent(0.5)
-      .range([2, 30])
+      .range([5, 40])
       .domain([0, maxEpisodes]);
 
     const myNodes = rawData.map((d) => {
@@ -120,16 +179,42 @@ function episodeChart() {
 
   // Create chart
   const chart = function chart(selector, rawData) {
-    nodes = createNodes(rawData);
+    let diff = null;
+    if (lastData) {
+      isFirstLoad = false;
+      diff = getDiff(rawData, lastData);
 
-    if (svg) {
-      d3.selectAll("svg").remove();
+      diff.remove.forEach((charInfo) => {
+        // console.log(`Removing ${charInfo.slug}`);
+        d3.select(`#${charInfo.slug}`).remove();
+      });
+
+      /*diff.reuse.forEach((charInfo) => {
+        console.log(`Enlarging ${charInfo.slug}`);
+      });*/
+
+      diff.deaths.forEach((charInfo) => {
+        console.log(`Fade to death ${charInfo.slug}`);
+      });
+
+      nodes = createNodes(rawData);
+    } else {
+      nodes = createNodes(rawData);
     }
-    svg = d3.select(selector)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height);
 
+    lastData = rawData;
+
+
+
+    /*if (svg) {
+      d3.selectAll("svg").remove();
+    } */
+    if (!svg) {
+      svg = d3.select(selector)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+    }
     bubbles = svg.selectAll('.bubble')
       .data(nodes, (d) => d.CID);
 
@@ -184,10 +269,10 @@ function episodeChart() {
     simulation.nodes(nodes);
 
     groupBubbles();
-    d3.select('#jon_snow').transition()
+    /*d3.select('#jon_snow').transition()
       .duration(5000)
       .attr('transform', 'translate(0)')
-      .attr('r', 200);
+      .attr('r', 200);*/
   };
 
   function ticked() {
