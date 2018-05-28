@@ -1,6 +1,7 @@
 /* Globals */
 let lastData = null;
 let isFirstLoad = true;
+let allEpisodes = null;
 
 function getDiff(curData, prevData) {
   /* Convert data list to a map for quick lookup */
@@ -95,7 +96,7 @@ function episodeChart() {
     'baratheon': '#feda95',
     'tyrell': '#88d3d1',
     'nymeros': '#fcba86',
-    'stark': '#6f6f6f',
+    'stark': '#93deff', //#6f6f6f',
     'arryn': '#506c86',
     'greyjoy': '#d8c5ad',
     'other': '#d8d8d8',
@@ -447,6 +448,17 @@ function showTimelineProgress(seasonNumber, episodeNumber) {
   });
 }
 
+function showEpisodeInfo(episode) {
+  //$('.episode-title').text(episode.title);
+  $(".episode-title").fadeOut(function() {
+    $(this).text(episode.title);
+  }).fadeIn();
+  $('.episode-order').text(`Season ${+episode.seasonNumber}, Episode ${+episode.episodeNumber}`);
+  $('.episode-duration').text(`${episode.duration} minutes`);
+  $('.episode-rating').text(episode.averageRating);
+  $('.episode-votes').text(episode.numVotes);
+}
+
 function displayEpisodeTimeline(episodes) {
   episodes = episodes.sort((e1, e2) => {
     if (e1.seasonNumber === e2.seasonNumber) {
@@ -480,6 +492,7 @@ function displayEpisodeTimeline(episodes) {
     $episodeStep.click(event => {
       loadEpisode(seasonNumber, episodeNumber);
       showTimelineProgress(seasonNumber, episodeNumber);
+      showEpisodeInfo(episode);
     });
 
     $episodeTimeline.append($episodeStep)
@@ -501,7 +514,11 @@ $(document).ready(function () {
 
   fetch(`http://localhost:5000/episodes`)
     .then(res => res.json())
-    .then(json => displayEpisodeTimeline(json));
+    .then(json => {
+      allEpisodes = json;
+      displayEpisodeTimeline(json);
+      showEpisodeInfo(json[0]);
+    });
 
   loadEpisode(1, 1);
 

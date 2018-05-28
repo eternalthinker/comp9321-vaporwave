@@ -75,6 +75,11 @@ body {
   text-align: center;
 }
 
+/* ------------ Episode info ----------------- */
+.episode-order {
+  color: #aaa;
+}
+
 
 /* --------------- Episode timeline ------------------*/
 /* Referred from: https://codepen.io/anon/pen/zjgvNE */

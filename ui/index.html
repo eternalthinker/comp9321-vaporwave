@@ -8,17 +8,30 @@
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="css/reset.css">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="css/got.css">
 </head>
 <body>
   <div class="container">
     <h1>A Visualization of Ice and Fire</h1>
-    <div id="toolbar">
-      <!--
-      <a href="#" id="all" class="button active">All Characters</a>
-      <a href="#" id="year" class="button">Characters By House</a> -->
+    <div class="row">
+      <div class="col-md-8">
+        <div id="vis"></div>
+      </div>
+      <div class="col-md-4">
+        <div class="episode">
+          <h3 class="episode-title">loading...</h3>
+          <h4 class="episode-order">loading...</h4>
+          <p><b>Duration:</b> <span class="episode-duration">0 minutes</span></p>
+          <p><b>Rating:</b>
+            <span class="label label-success episode-rating">0.0</span> from
+            <span class="episode-votes">0</span> votes
+          </p>
+        </div>
+      </div>
+      
     </div>
-    <div id="vis"></div>
 
     <nav class="form-steps" id="episode-timeline">
       <!-- <div class="form-steps__item form-steps__item--active">
@@ -51,6 +64,8 @@
   <!--script src="//d3js.org/d3.v4.min.js"></script-->
   <script type="text/javascript" src="lib/d3.js"></script>
   <script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="src/tooltip.js"></script>
   <script src="src/got.js"></script>
 
