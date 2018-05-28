@@ -493,7 +493,8 @@ function displayEpisodeTimeline(episodes) {
         class="episode-step form-steps__item"
         data-toggle="tooltip" 
         data-placement="top" 
-        title="Season ${seasonNumber}, Episode ${episodeNumber}"
+        data-html="true"
+        title="Season ${seasonNumber}, Episode ${episodeNumber}<br/><b>${episode.title}</b>"
       >
         <div class="form-steps__item-content">
           <span class="form-steps__item-icon">${episodeNumber}</span>
