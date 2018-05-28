@@ -53,6 +53,17 @@ function getDiff(curData, prevData) {
   };
 }
 
+function getDiffFromService(curData, prevData) {
+  return callApi({
+    endpoint: `http://localhost:5001/diff`,
+    method: 'POST',
+    data: {
+      'curr_data': curData,
+      'prev_data': prevData
+    }
+  });
+}
+
 
 function episodeChart() {
   const width = 940;
@@ -184,11 +195,11 @@ function episodeChart() {
   }
 
   // Create chart
-  const chart = function chart(selector, rawData) {
+  const chart = async function chart(selector, rawData) {
     let diff = null;
     if (lastData) {
       isFirstLoad = false;
-      diff = getDiff(rawData, lastData);
+      diff = await getDiffFromService(rawData, lastData);
     }
 
     // lastData = rawData;
@@ -447,7 +458,7 @@ function loadEpisode(seasonNumber, episodeNumber) {
             charactersIaF, 
             characterImages
           );
-          console.log(characters);
+          //console.log(characters);
           display(characters);
         }); // Img service 
       }); // IaF - characters

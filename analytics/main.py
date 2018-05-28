@@ -4,8 +4,6 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "Very very very secret key"
 
-port_number = 6000
-
 @app.route("/diff", methods=['POST'])
 def get_analytics():
     curr_data = request.json['curr_data']
@@ -44,6 +42,7 @@ def get_analytics():
     return jsonify({ 'add': add, 'reuse': reuse, 'deaths':deaths, 'reverseDeaths': reverseDeaths, 'remove':remove})
 
 
+@app.after_request
 def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = '*'
@@ -52,6 +51,5 @@ def after_request(response):
     return response
 
 
-
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', port=port_number)
+    app.run(debug=True, host='127.0.0.1', port=5001)
