@@ -28,9 +28,11 @@ def get_analytics():
         if i in prev_data_dict:
             curr_alive = curr_data_dict[i]['is_alive']
             pre_Alive =  prev_data_dict[i]['is_alive']
-            if pre_Alive == 'true' and not curr_alive == 'true':
+            print(i,curr_alive)
+            print(i, pre_Alive)
+            if pre_Alive  and not curr_alive :
                 deaths.append(i)
-            elif not pre_Alive == 'true' and curr_alive == 'true':
+            elif not pre_Alive  and curr_alive:
                 reverseDeaths.append(i)
             reuse.append(i)
         else:
