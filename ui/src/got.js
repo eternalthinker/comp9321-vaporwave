@@ -59,11 +59,11 @@ function episodeChart() {
     'frey': '#409d9b'
   };
 
-  let houseDomains = Object.keys(houseColorMappings);
+  /*let houseDomains = Object.keys(houseColorMappings);
   let houseColorRange = [];
   for (let key of houseDomains) {
     houseColorRange.push(houseColorMappings[key]);
-  }
+  }*/
 
   /*const fillColor = d3.scaleOrdinal()
     .domain(houseDomains)
@@ -99,6 +99,7 @@ function episodeChart() {
 
     const myNodes = rawData.map((d) => {
       return {
+        ...d,
         slug: d.CID,
         name: d.name,
         actor: d.actor,
@@ -117,6 +118,7 @@ function episodeChart() {
     return myNodes;
   }
 
+  // Create chart
   const chart = function chart(selector, rawData) {
     nodes = createNodes(rawData);
 
@@ -158,6 +160,7 @@ function episodeChart() {
 
     const bubblesE = bubbles.enter().append('circle')
       .classed('bubble', true)
+      .attr('id', d => d.slug)
       //.attr('r', 0)
       .attr('fill', function (d) { return fillColor(d.house); })
       .attr('stroke', function (d) { return d3.rgb(fillColor(d.house)).darker(); })
@@ -181,6 +184,10 @@ function episodeChart() {
     simulation.nodes(nodes);
 
     groupBubbles();
+    d3.select('#jon_snow').transition()
+      .duration(5000)
+      .attr('transform', 'translate(0)')
+      .attr('r', 200);
   };
 
   function ticked() {
