@@ -7,31 +7,43 @@
   <meta name="author" content="Rahul Anand">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/reset.css">
   <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="css/got.css">
 </head>
 <body>
-  <div class="container">
-    <div class="row">
-      <h2>The Timeline of Ice and Fire</h2>
-      <h4><small>A narrative of character changes across episodes in Game of Thrones TV series</small></h4>
-    </div>
+  <div class="container-fluid">
+    <h2>The Timeline of Ice and Fire</h2>
+    <h5><small class="text-muted">A narrative of character changes across episodes in Game of Thrones TV series</small></h5>
     <div class="row">
       <div class="col-md-8">
         <div id="vis"></div>
       </div>
       <div class="col-md-4">
+        <!-- Episode info -->
         <div class="episode">
           <h3 class="episode-title">loading...</h3>
           <h4 class="episode-order">loading...</h4>
-          <p><b>Duration:</b> <span class="episode-duration">0 minutes</span></p>
-          <p><b>Rating:</b>
-            <span class="label label-success episode-rating">0.0</span> from
+          <p><b>Duration:</b> <span class="episode-duration">0 minutes</span><br/>
+          <b>IMDb Rating:</b>
+            <span class="badge badge-success episode-rating">0.0</span> from
             <span class="episode-votes">0</span> votes
           </p>
         </div>
+        <!-- Character info -->
+        <div class="card character" style="width: 18rem;">
+          <img class="card-img-top character-image" src="http://localhost:1337/static/ellaria_sand.jpeg" alt="">
+          <div class="card-body">
+            <h5 class="card-title character-name">loading..</h5>
+            <h6 class="card-subtitle mb-2 text-muted character-house">loading..</h6>
+            <p class="character-death"></p>
+            <p class="card-text character-quote">loading..</p>
+          </div>
+        </div>
+        <!-- Character death info -->
       </div>
       
     </div>
@@ -69,7 +81,7 @@
   <script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="src/tooltip.js"></script>
   <script src="src/got.js"></script>
 

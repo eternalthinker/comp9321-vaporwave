@@ -281,10 +281,6 @@ function episodeChart() {
           ;
       });
 
-      /*diff.reuse.forEach((charInfo) => {
-        console.log(`Enlarging ${charInfo.slug}`);
-      });*/
-
       diff.deaths.forEach((charInfo) => {
         d3.select(`#${charInfo.slug}`).transition()
           .duration(2000)
@@ -313,6 +309,24 @@ function episodeChart() {
     simulation.alpha(1).restart();
   }
 
+  function showCharacter(d) {
+    $('.character-name').text(d.name);
+    $('.character-house').text(d.house || '');
+    $('.character-image').attr('src', d.image || '');
+    $('.character-quote').html(d.quotes ? d.quotes[0] : '');
+    if (d.isAlive) {
+      $('.character-death').hide();
+    } else {
+      $('.character-death').text(d.means_of_death);
+      $('.character-death').show();
+    }
+    $('.character').show();
+  }
+
+  function hideCharacter(d) {
+    $('.character').hide(); 
+  }
+
   function showDetail(d) {
     d3.select(this).attr('stroke', 'black');
 
@@ -326,6 +340,7 @@ function episodeChart() {
                   d.actor +
                   '</span>';
     tooltip.showTooltip(content, d3.event);
+    showCharacter(d);
   }
 
   function hideDetail(d) {
@@ -333,6 +348,7 @@ function episodeChart() {
       .attr('stroke', d3.rgb(fillColor(d.house)).darker());
 
     tooltip.hideTooltip();
+    hideCharacter(d);
   }
 
   return chart;
@@ -385,7 +401,7 @@ function mashUp(episodeCharacters, characterQuotes, charactersIaF, characterImag
     return {
       ...charInfo,
       ...episodeCharactersMap[slug],
-      quotes: characterQuotes[slug],
+      quotes: characterQuotesMap[slug],
       image: characterImages[slug]
     }
   });
